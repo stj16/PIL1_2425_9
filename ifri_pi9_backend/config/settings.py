@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
-
+import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -37,6 +37,16 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    
+    # Apps locales
+    'ifri_pi9_backend.api',
+    'ifri_pi9_backend.offer',
+    'ifri_pi9_backend.request',
+    'ifri_pi9_backend.msg',
+    
+    # Extensions
+    'rest_framework',
+    'channels',
 ]
 
 MIDDLEWARE = [
@@ -49,7 +59,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'config.urls'
+ROOT_URLCONF = 'ifri_pi9_backend.config.urls'
 
 TEMPLATES = [
     {
@@ -66,7 +76,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'config.wsgi.application'
+WSGI_APPLICATION = 'ifri_pi9_backend.config.wsgi.application'
 
 
 # Database
@@ -120,24 +130,24 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = 'static/'
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'ifri_pi9_backend/static'),
+]  # Make sure this directory exists, or create it.
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-INSTALLED_APPS = [
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
+# Configuration ASGI pour Django Channels
+ASGI_APPLICATION = 'ifri_pi9_backend.asgi.application'
 
-    # apps personnelles
-    'api',
-
-    # extensions
-    'rest_framework',
-]
-
+# Configuration des canaux pour Redis
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("127.0.0.1", 6379)],
+        },
+    },
+}
