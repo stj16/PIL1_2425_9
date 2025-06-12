@@ -1,0 +1,35 @@
+# Environnement virtuel Python
+venv/
+
+# Fichiers générés automatiquement
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Fichiers de base de données
+*.sqlite3
+db.sqlite3
+
+# Fichiers de configuration sensibles
+.env
+.env.*
+*.secret
+
+# Dossiers statiques générés
+static/
+media/
+
+# Fichiers spécifiques à l’IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Node/Frontend (si jamais tu as du JS ici)
+node_modules/
+dist/
+build/
+
+# Django migrations cache
+*/migrations/__pycache__/
