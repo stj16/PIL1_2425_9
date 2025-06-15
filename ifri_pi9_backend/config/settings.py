@@ -43,6 +43,8 @@ INSTALLED_APPS = [
     'ifri_pi9_backend.offer',
     'ifri_pi9_backend.request',
     'ifri_pi9_backend.msg',
+    'ifri_pi9_backend.account',
+    'ifri_pi9_backend.forgotpassword',
     
     # Extensions
     'rest_framework',

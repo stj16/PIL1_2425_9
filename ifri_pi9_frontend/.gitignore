@@ -28,3 +28,51 @@ coverage
 *.sw?
 
 *.tsbuildinfo
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Node modules
+node_modules/
+
+# Build output
+dist/
+dist-ssr/
+build/
+coverage/
+
+# Vite/webpack cache
+.cache/
+.vite/
+
+# Cypress
+cypress/videos/
+cypress/screenshots/
+
+# Editor directories and files
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+*.tsbuildinfo
+
+# MacOS
+.DS_Store
+
+# Env files
+.env
+.env.*
+
+# Public assets (optionnel, si tu génères des fichiers temporaires ici)
+# /public/assets/
+
+# Autres
+*.local

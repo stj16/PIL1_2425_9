@@ -1,17 +1,24 @@
-# Environnement virtuel Python
+# Environnements virtuels Python
 venv/
+.venv/
 
-# Fichiers générés automatiquement
+# Fichiers Python générés
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
 
-# Fichiers de base de données
+# Fichiers de base de données (SQLite et PostgreSQL dumps)
 *.sqlite3
 db.sqlite3
+*.psql
+*.pgsql
+*.pg_dump
+*.sql
+*.dump
+*.backup
 
-# Fichiers de configuration sensibles
+# Fichiers sensibles
 .env
 .env.*
 *.secret
@@ -20,7 +27,7 @@ db.sqlite3
 static/
 media/
 
-# Fichiers spécifiques à l’IDE
+# Fichiers/dossiers d’IDE et éditeurs
 .vscode/
 .idea/
 *.swp
@@ -33,3 +40,17 @@ build/
 
 # Django migrations cache
 */migrations/__pycache__/
+
+# Fichiers de test
+.pytest_cache/
+.coverage
+
+# Fichiers temporaires
+*.tmp
+*.log
+
+# MacOS
+.DS_Store
+
+# Autres (egg, etc.)
+*.egg-info/

@@ -22,4 +22,6 @@ urlpatterns = [
    path('offer/', include('ifri_pi9_backend.offer.urls')),
     path('msg/', include('ifri_pi9_backend.msg.urls')),
     path('request/', include('ifri_pi9_backend.request.urls')),
+    path('account/', include('ifri_pi9_backend.account.urls')),
+    path('forgotpassword/', include('ifri_pi9_backend.forgotpassword.urls')),
 ]
