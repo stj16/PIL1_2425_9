@@ -46,9 +46,11 @@ INSTALLED_APPS = [
     'ifri_pi9_backend.account',
     'ifri_pi9_backend.forgotpassword',
     
+    
     # Extensions
     'rest_framework',
     'channels',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
@@ -59,7 +61,15 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
 ]
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",# le port de Vite/Vue.js
+    "http://127.0.0.1:5173",
+]
+CORS_ALLOW_ALL_ORIGINS = True
+  
+
 
 ROOT_URLCONF = 'ifri_pi9_backend.config.urls'
 
@@ -160,4 +170,13 @@ CHANNEL_LAYERS = {
             "hosts": [("127.0.0.1", 6379)],
         },
     },
+}
+AUTH_USER_MODEL = 'account.User'  
+
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ],
 }

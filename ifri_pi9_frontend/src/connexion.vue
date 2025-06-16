@@ -1,3 +1,24 @@
+<script>
+import api from "@/api";
+
+export default {
+  data() {
+    return {
+      utilisateurs: []
+    }
+  },
+  mounted() {
+    api.get("/utilisateur/").then(res => {
+      this.utilisateurs = res.data;
+    }).catch(err => {
+      console.error("Erreur API :", err);
+    });
+  }
+}
+</script>
+
+
+
 <template>
   <div class="auth-page">
     <!-- Fond avec effet de flou -->
@@ -148,6 +169,9 @@ const handleRegister = () => {
 
 function retourAccueil() {
   router.go(-1)
+
+
+  
 }
 
 </script>
@@ -387,3 +411,6 @@ input[type="radio"]:checked + .custom-radio::after {
   font-size: 0.95rem;
 }
 </style>
+
+
+
