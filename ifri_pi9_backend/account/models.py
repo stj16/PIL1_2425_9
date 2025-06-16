@@ -1,6 +1,8 @@
+from tracemalloc import start
 from django.db import models
-from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager, Group, Permission
+from django.contrib.auth.models import AbstractUser, AbstractBaseUser, PermissionsMixin, BaseUserManager, Group, Permission
 from django.db import models
+from phonenumber_field.modelfields import PhoneNumberField
 
 class Co_User(BaseUserManager):
     def create_user(self, email, password=None, role='passager', **extra_fields):
@@ -16,7 +18,9 @@ class Co_User(BaseUserManager):
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('id_superUser', True)
         return self.create_user(email, password, **extra_fields)
-    
+
+
+
 
 class User(AbstractBaseUser, PermissionsMixin):
     groups = models.ManyToManyField(
@@ -40,9 +44,12 @@ class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(unique=True)
     nom = models.CharField(max_length=100)
     prenom = models.CharField(max_length=100)
-    role = models.CharField(max_length=20, choices=ROLE_CHOICES)  
+    role = models.CharField(max_length=20, choices=ROLE_CHOICES)
+    phone_number = PhoneNumberField(blank=True, null=True, region='FR')  # pour la France
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
+    photo = models.ImageField(upload_to='photos/', blank=True, null=True)
+    
 
 
     objects = Co_User()

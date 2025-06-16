@@ -7,7 +7,7 @@ from rest_framework.response import Response
 from .models import caroffer
 from .serializers import carofferSerializer
 from .utils import geocode_address_osm, haversine
-
+from .permissions import IsOwnerOrReadOnly 
 
 
 # Create your views here.
@@ -16,6 +16,13 @@ class carofferList(generics.ListCreateAPIView):
     serializer_class = carofferSerializer
     
 
+
+
+
+class carofferViewSet(viewsets.ModelViewSet):
+    queryset = caroffer.objects.all()
+    serializer_class = carofferSerializer
+    permission_classes = [IsOwnerOrReadOnly]
 
 
 

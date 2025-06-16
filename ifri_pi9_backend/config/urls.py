@@ -16,7 +16,8 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-
+from django.conf import settings
+from django.conf.urls.static import static
 urlpatterns = [
     path('admin/', admin.site.urls),
    path('offer/', include('ifri_pi9_backend.offer.urls')),
@@ -24,4 +25,4 @@ urlpatterns = [
     path('request/', include('ifri_pi9_backend.request.urls')),
     path('account/', include('ifri_pi9_backend.account.urls')),
     path('forgotpassword/', include('ifri_pi9_backend.forgotpassword.urls')),
-]
+]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

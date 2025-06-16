@@ -6,7 +6,8 @@ class carrequest(models.Model):
     user= models.ForeignKey(User, on_delete=models.CASCADE)
     depart = models.CharField(max_length=200)
     arrive = models.CharField(max_length=200)
-    address = models.CharField(max_length=400)
+    start_hours_usual = models.IntegerField()
+    
     date_time = models.DateTimeField(auto_now_add=True)
       
     
