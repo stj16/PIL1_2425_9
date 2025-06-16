@@ -1,0 +1,56 @@
+# Environnements virtuels Python
+venv/
+.venv/
+
+# Fichiers Python générés
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Fichiers de base de données (SQLite et PostgreSQL dumps)
+*.sqlite3
+db.sqlite3
+*.psql
+*.pgsql
+*.pg_dump
+*.sql
+*.dump
+*.backup
+
+# Fichiers sensibles
+.env
+.env.*
+*.secret
+
+# Dossiers statiques générés
+static/
+media/
+
+# Fichiers/dossiers d’IDE et éditeurs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Node/Frontend (si jamais tu as du JS ici)
+node_modules/
+dist/
+build/
+
+# Django migrations cache
+*/migrations/__pycache__/
+
+# Fichiers de test
+.pytest_cache/
+.coverage
+
+# Fichiers temporaires
+*.tmp
+*.log
+
+# MacOS
+.DS_Store
+
+# Autres (egg, etc.)
+*.egg-info/
