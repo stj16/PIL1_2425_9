@@ -1,30 +1,101 @@
+<script>
+import { login, register } from "@/api";
+
+export default {
+  data() {
+    return {
+      // Connexion
+      login: {
+        email: '',
+        password: '',
+        remember: false
+      },
+      // Inscription
+      register: {
+        email: '',
+        username: '',
+        nom: '',
+        prenom: '',
+        role: '',
+        password: '',
+        confirmpassword: ''
+      },
+      loginClicked: false,
+      registerClicked: false,
+      activeTab: 'login',
+      activeTabStyle: {
+        background: '#fff', color: '#1e293b', fontWeight: 'bold'
+      },
+      errorMsg: '',
+      registerMsg: ''
+    }
+  },
+  methods: {
+    async handleLogin() {
+      this.errorMsg = '';
+      try {
+        const res = await login(this.login.email, this.login.password);
+        localStorage.setItem('access', res.data.access);
+        localStorage.setItem('refresh', res.data.refresh);
+        this.$router.push('/acceuil');
+      } catch (err) {
+        this.errorMsg = 'Identifiants invalides';
+      }
+    },
+    async handleRegister() {
+      this.registerMsg = '';
+      this.errorMsg = '';
+      if (this.register.password !== this.register.confirmpassword) {
+        this.errorMsg = 'Les mots de passe ne correspondent pas';
+        return;
+      }
+      const payload = {
+        email: this.register.email,
+        username: this.register.username,
+        nom: this.register.nom,
+        prenom: this.register.prenom,
+        role: this.register.role,
+        password: this.register.password
+      };
+      try {
+        await register(payload);
+        this.registerMsg = 'Inscription réussie ! Connectez-vous.';
+        this.activeTab = 'login';
+        this.register = {
+          email: '', username: '', nom: '', prenom: '', role: '', password: '', confirmpassword: ''
+        };
+      } catch (err) {
+        this.errorMsg = "Erreur lors de l'inscription. Vérifiez vos informations.";
+      }
+    }
+  }
+}
+</script>
+
+
+
 <template>
   <div class="auth-page">
     <div class="background"></div>
+
+
     <div class="auth-container">
       <div class="header">
         <h1>GO-IFRI</h1>
         <p class="tagline">Votre solution de transport premium</p>
       </div>
       <div class="tabs">
-        <button 
-          @click="activeTab = 'login'"
-          :class="{ active: activeTab === 'login', 'tab-button': true }"
-          :style="activeTab === 'login' ? activeTabStyle : ''"
-        >
+        <button @click="activeTab = 'login'" :class="{ active: activeTab === 'login', 'tab-button': true }"
+          :style="activeTab === 'login' ? activeTabStyle : ''">
           Connexion
         </button>
-        <button 
-          @click="activeTab = 'register'"
-          :class="{ active: activeTab === 'register', 'tab-button': true }"
-          :style="activeTab === 'register' ? activeTabStyle : ''"
-        >
+        <button @click="activeTab = 'register'" :class="{ active: activeTab === 'register', 'tab-button': true }"
+          :style="activeTab === 'register' ? activeTabStyle : ''">
           Inscription
         </button>
         <router-link to="/acceuil">
-          <button  @click="activeTab = 'acceuil'"
-          :class="{ active: activeTab === 'acceuil', 'tab-button': true }"
-          :style="activeTab === 'acceuil' ? activeTabStyle : ''">Back</button>
+          <button @click="activeTab = 'acceuil'" :class="{ active: activeTab === 'acceuil', 'tab-button': true }"
+            :style="activeTab === 'acceuil' ? activeTabStyle : ''">Back</button>
         </router-link>
       </div>
       <div class="form-glass">
@@ -42,6 +113,7 @@
             </label>
             <router-link to="/motdepasseoublier" class="forgot-password">Mot de passe oublié ?</router-link>
           </div>
+
           <router-link to="/Welcome">
             <button 
             type="submit" 
@@ -56,6 +128,7 @@
           </router-link>
         </form>
         <form v-else @submit.prevent="handleRegister" class="register-form">
+
           <div class="input-group">
             <input type="text" v-model="register.name" placeholder="Nom Complet" required>
           </div>
@@ -99,45 +172,8 @@
   </div>
 </template>
 
-<script setup>
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
 
-const router = useRouter()
 
-const activeTab = ref('login')
-const loginClicked = ref(false)
-const registerClicked = ref(false)
-const login = ref({
-  email: '',
-  password: '',
-  remember: false
-})
-
-const register = ref({
-  name: '',
-  email: '',
-  password: '',
-  role: 'passager'
-})
-
-const activeTabStyle = {
-  backgroundColor: '#0f2027',
-  color: 'white'
-}
-
-const handleLogin = () => {
-  console.log('Login attempt:', login.value)
-}
-
-const handleRegister = () => {
-  console.log('Registration attempt:', register.value);
-}
-
-function retourAccueil() {
-  router.go(-1)
-}
-</script>
 
 <style scoped>
 * {
@@ -188,6 +224,7 @@ function retourAccueil() {
   font-weight: 800;
   letter-spacing: 4px;
   margin-bottom: 10px;
+
 }
 
 .tagline {
@@ -206,6 +243,7 @@ function retourAccueil() {
   flex-wrap: wrap;
   gap: 10px;
 }
+
 .tab-button {
   padding: 12px 40px;
   border: none;
@@ -291,7 +329,7 @@ input:focus {
 
 .forgot-password:hover {
   color: #ff9800;
-  border-bottom: solid 1px #ff9800 ;
+  border-bottom: solid 1px #ff9800;
   transform: translateY(1px);
 }
 
@@ -358,12 +396,12 @@ input[type="radio"] {
   display: none;
 }
 
-input[type="radio"]:checked + .custom-radio {
+input[type="radio"]:checked+.custom-radio {
   border-color: #0109f6eb;
   background-color: #0109f6eb;
 }
 
-input[type="radio"]:checked + .custom-radio::after {
+input[type="radio"]:checked+.custom-radio::after {
   content: '';
   position: absolute;
   width: 8px;

@@ -44,8 +44,9 @@ class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(unique=True)
     nom = models.CharField(max_length=100)
     prenom = models.CharField(max_length=100)
+    username = models.CharField(max_length=100)
     role = models.CharField(max_length=20, choices=ROLE_CHOICES)
-    phone_number = PhoneNumberField(blank=True, null=True, region='FR')  # pour la France
+    phone_number = PhoneNumberField(blank=True, null=True, region='BJ')  
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     photo = models.ImageField(upload_to='photos/', blank=True, null=True)
