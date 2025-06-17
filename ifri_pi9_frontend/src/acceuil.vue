@@ -98,7 +98,9 @@
 
     <!-- Témoignages -->
     <section class="testimonials">
-      <marquee behavior="" direction=""><h2 style="font-weight: bolder;">Ce que nos utilisateurs disent :</h2></marquee>
+      <div class="marquee">
+        <span>Ce que nos utilisateurs disent :</span>
+      </div>
       <div class="testimonial-grid">
         <div class="testimonial-card">
           <div class="testimonial-text">
@@ -584,5 +586,21 @@ function Connexion(){
   .nav-buttons {
     margin-top: 1rem;
   }
+}
+
+
+.marquee {
+  width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+}
+.marquee span {
+  display: inline-block;
+  padding-left: 100%;
+  animation: marquee 10s linear infinite;
+}
+@keyframes marquee {
+  0%   { transform: translate(0, 0); }
+  100% { transform: translate(-100%, 0); }
 }
 </style>
