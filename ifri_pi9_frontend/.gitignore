@@ -28,8 +28,7 @@ coverage
 *.sw?
 
 *.tsbuildinfo
-<<<<<<< HEAD
-=======
+
 
 # Logs
 logs
@@ -78,4 +77,4 @@ cypress/screenshots/
 
 # Autres
 *.local
->>>>>>> cc984066b0d6b4b12a96449dc4e6c93e6e064486
+
