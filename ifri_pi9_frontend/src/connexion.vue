@@ -37,7 +37,7 @@ export default {
         const res = await login(this.login.email, this.login.password);
         localStorage.setItem('access', res.data.access);
         localStorage.setItem('refresh', res.data.refresh);
-        this.$router.push('/acceuil');
+        this.$router.push('/welcome');
       } catch (err) {
         this.errorMsg = 'Identifiants invalides';
       }
@@ -114,8 +114,7 @@ export default {
             <router-link to="/motdepasseoublier" class="forgot-password">Mot de passe oublié ?</router-link>
           </div>
 
-          <router-link to="/Welcome">
-            <button 
+          <button 
             type="submit" 
             class="submit-btn"
             :class="{ clicked: loginClicked }"
@@ -125,7 +124,6 @@ export default {
           >
             Se connecter
           </button>
-          </router-link>
         </form>
         <form v-else @submit.prevent="handleRegister" class="register-form">
 
@@ -156,7 +154,7 @@ export default {
               </label>
             </div>
           </div>
-          <router-link to="/Welcome"><button 
+          <button 
             type="submit" 
             class="submit-btn"
             :class="{ clicked: registerClicked }"
@@ -165,7 +163,7 @@ export default {
             @mouseleave="registerClicked = false"
           >
             S'inscrire
-          </button></router-link>
+          </button>
         </form>
       </div>
     </div>

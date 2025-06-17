@@ -10,21 +10,14 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
-<<<<<<< HEAD
     "autoprefixer": "^10.4.17",
     "axios": "^1.10.0",
     "lucide-vue-next": "^0.264.0",
-    "pinia": "^2.1.7",
+    "pinia": "^3.0.1",
     "postcss": "^8.4.35",
     "tailwindcss": "^3.4.0",
-    "vue": "^3.4.0",
-    "vue-router": "^4.2.5"
-=======
-    "axios": "^1.10.0",
-    "pinia": "^3.0.1",
     "vue": "^3.5.13",
     "vue-router": "^4.5.0"
->>>>>>> a2ca4c08a1c68280d3757b832b1e28a6611490aa
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.2.3",

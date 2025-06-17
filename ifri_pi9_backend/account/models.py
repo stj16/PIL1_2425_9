@@ -23,6 +23,9 @@ class Co_User(BaseUserManager):
 
 
 class User(AbstractBaseUser, PermissionsMixin):
+    class Meta:
+        app_label = 'account'  # Ajout de l'app_label
+        
     groups = models.ManyToManyField(
         Group,
         related_name='user_groups',  # nom unique ici

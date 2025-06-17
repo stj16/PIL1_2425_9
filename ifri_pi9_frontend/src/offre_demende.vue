@@ -86,18 +86,14 @@
                     <div v-else-if="activeTab==='publier'" key="publier">
                         <h2>Publier une offre de covoiturage</h2>
                         <form class="form" @submit.prevent="submitOffre">
-                            <select v-model="nouvelleOffre.type" required>
-                                <option disabled value="">Type de véhicule</option>
-                                <option>Voiture</option>
-                                <option>Moto</option>
-                            </select>
-                            <input v-model="nouvelleOffre.matricule" required placeholder="Matricule" />
                             <input v-model="nouvelleOffre.depart" required placeholder="Départ" />
-                            <input v-model="nouvelleOffre.arrivee" required placeholder="Arrivée" />
-                            <input v-model="nouvelleOffre.date" type="date" required />
-                            <input v-model="nouvelleOffre.heure" type="time" required />
-                            <input v-model="nouvelleOffre.places" type="number" min="1" required placeholder="Places disponibles" />
-                            <input v-model="nouvelleOffre.prix" type="number" min="0" required placeholder="Prix (FCFA)" />
+                            <input v-model="nouvelleOffre.arrive" required placeholder="Arrivée" />
+                            <input v-model="nouvelleOffre.matricule" required placeholder="Immatriculation du véhicule" />
+                            <input v-model="nouvelleOffre.day" type="date" required placeholder="Jour du trajet" />
+                            <input v-model="nouvelleOffre.hour" type="time" required placeholder="Heure " />
+                            <input v-model="nouvelleOffre.start_point_usual" required placeholder="Point de départ précis" />
+                            <input v-model.number="nouvelleOffre.place" type="number" min="1" required placeholder="Nombre de places" />
+                            <input v-model.number="nouvelleOffre.price" type="number" min="0" required placeholder="Prix (FCFA)" />
                             <button type="submit">Publier l'offre</button>
                         </form>
                     </div>
@@ -131,7 +127,8 @@
 </template>
 
 <script setup>
-import { ref, computed, nextTick } from 'vue'
+import { ref, computed, onMounted } from 'vue'
+import { getOffers, createOffer } from '@/api';
 
 // Onglet actif
 const activeTab = ref('offres')
@@ -228,36 +225,123 @@ const trajetsRecents = ref([
 
 // Formulaire de publication d'offre
 const nouvelleOffre = ref({
-    type: '',
-    matricule: '',
     depart: '',
-    arrivee: '',
-    date: '',
-    heure: '',
-    places: 1,
-    prix: 0
+    arrive: '',
+    matricule: '',
+    day: '',
+    hour: '',
+    start_point_usual: '',
+    place: 1,
+    price: 0
 })
-function submitOffre() {
-    offres.value.push({
-        ...nouvelleOffre.value,
-        id: Date.now(),
-        conducteur: 'Vous'
-    })
-    alert('Offre publiée !')
-    nouvelleOffre.value = {
-        type: '',
-        matricule: '',
-        depart: '',
-        arrivee: '',
-        date: '',
-        heure: '',
-        places: 1,
-        prix: 0
-    }
-}
 
 // Side panel pour trajets récents
-const showSidePanel = ref(false)
+const showSidePanel = ref(false);
+
+// État des données
+const offers = ref([]);
+const loading = ref(false);
+const error = ref('');
+
+// Fonction pour charger les offres
+const fetchOffers = async () => {
+  try {
+    loading.value = true;
+    console.log('Token JWT:', localStorage.getItem('access')); // Debug
+    const response = await getOffers();
+    console.log('Réponse API:', response); // Debug
+    offers.value = response.data;
+  } catch (err) {
+    error.value = 'Erreur lors du chargement des offres';
+    console.error('Erreur:', err);
+  } finally {
+    loading.value = false;
+  }
+};
+
+// Fonction pour créer une offre
+const submitOffre = async () => {
+  try {
+    loading.value = true;
+    
+    // Formater les données avant envoi
+    const offreData = {
+      depart: nouvelleOffre.value.depart,
+      arrive: nouvelleOffre.value.arrive,
+      matricule: nouvelleOffre.value.matricule,
+      day: nouvelleOffre.value.day, // Format attendu: YYYY-MM-DD
+      hour: nouvelleOffre.value.hour, // Format attendu: HH:MM
+      start_point_usual: nouvelleOffre.value.start_point_usual,
+      place: parseInt(nouvelleOffre.value.place, 10),
+      price: parseInt(nouvelleOffre.value.price, 10)
+    };
+    
+    console.log('Données à envoyer :', offreData);
+    
+    const response = await createOffer(offreData);
+    console.log('Réponse du serveur :', response);
+    
+    if (response.status === 201) {
+      // Ajouter la nouvelle offre à la liste
+      offres.value.unshift({
+        id: offres.value.length > 0 ? Math.max(...offres.value.map(o => o.id)) + 1 : 1,
+        type: 'Voiture',
+        depart: offreData.depart,
+        arrivee: offreData.arrive,
+        date: offreData.day,
+        heure: offreData.hour,
+        conducteur: 'Moi',
+        places: offreData.place,
+        prix: offreData.price
+      });
+      
+      // Réinitialiser le formulaire
+      nouvelleOffre.value = {
+        depart: '',
+        arrive: '',
+        matricule: '',
+        day: '',
+        hour: '',
+        start_point_usual: '',
+        place: 1,
+        price: 0
+      };
+      
+      // Recharger les offres
+      await fetchOffers();
+      
+      // Afficher un message de succès
+      alert('Offre créée avec succès !');
+      
+      // Revenir à l'onglet des offres
+      activeTab.value = 'offres';
+    } else {
+      throw new Error(response.data?.message || 'Erreur inconnue lors de la création de l\'offre');
+    }
+    
+  } catch (error) {
+    console.error('Erreur lors de la création de l\'offre :', error);
+    const errorMessage = error.response?.data?.message || 
+                        error.response?.data?.error || 
+                        error.message || 
+                        'Erreur inconnue lors de la création de l\'offre';
+    
+    // Afficher l'erreur à l'utilisateur
+    error.value = typeof errorMessage === 'object' ? JSON.stringify(errorMessage) : errorMessage;
+    alert(`Erreur : ${error.value}`);
+  } finally {
+    loading.value = false;
+  }
+};
+
+// Charger les offres au montage du composant
+onMounted(() => {
+  fetchOffers();
+});
+
+
+
+
 </script>
 
 <style scoped>

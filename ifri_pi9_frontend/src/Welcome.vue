@@ -12,16 +12,18 @@
                 </p>
             </section>
             <section class="search-section">
-                <input
-                    v-model="locality"
-                    type="text"
-                    placeholder="Entrez votre localité..."
-                    class="locality-input"
-                    @keyup.enter="fetchOffers"
-                />
-                <button @click="fetchOffers" class="search-btn">
-                    <i class="fa fa-search"></i> Rechercher
-                </button>
+                <div class="search-container">
+                    <input
+                        v-model="locality"
+                        type="text"
+                        placeholder="Entrez votre localité..."
+                        class="locality-input"
+                        @keyup.enter="fetchOffers"
+                    />
+                    <button @click="fetchOffers" class="search-btn">
+                        <i class="fa fa-search"></i> Rechercher
+                    </button>
+                </div>
             </section>
             <section class="offers-section">
                 <h2>Offres de covoiturage disponibles</h2>
@@ -62,55 +64,27 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
+import { getOffers } from '@/api' // On utilise notre fichier centralisé
 import { useRouter } from 'vue-router'
+
 const router = useRouter()
 const locality = ref('')
 const offers = ref([])
 
-const mockOffers = [
-    {
-        id: 1,
-        departure: 'Cotonou',
-        destination: 'Calavi',
-        date: '2024-06-15',
-        driver: '',
-        seats: 3,
-        locality: ''
-    },
-    {
-        id: 2,
-        departure: 'Calavi',
-        destination: 'Ouihah',
-        date: '2024-06-16',
-        driver: '',
-        seats: 2,
-        locality: ''
-    },
-    {
-        id: 3,
-        departure: 'Arconville',
-        destination: 'Calavi',
-        date: '2024-06-17',
-        driver: '',
-        seats: 4,
-        locality: ''
+// La fonction est maintenant beaucoup plus simple !
+async function fetchOffers() {
+    try {
+        const response = await getOffers(locality.value);
+        offers.value = response.data;
+    } catch (error) {
+        console.error('Erreur lors de la récupération des offres:', error);
     }
-]
-
-// Show all offers by default
-offers.value = mockOffers
-
-function fetchOffers() {
-    if (!locality.value.trim()) {
-        offers.value = mockOffers
-        return
-    }
-    offers.value = mockOffers.filter(
-        offer =>
-            offer.locality.toLowerCase().includes(locality.value.trim().toLowerCase())
-    )
 }
+
+onMounted(() => {
+    fetchOffers();
+});
 
 // Theme logic
 const theme = ref('light')
@@ -206,9 +180,18 @@ function toggleTheme() {
 .search-section {
     margin: 1.5rem 0 1rem 0;
     display: flex;
+    justify-content: center;
+    width: 100%;
+    padding: 0 1rem;
+    box-sizing: border-box;
+}
+
+.search-container {
+    display: flex;
     gap: 1rem;
     align-items: center;
-    justify-content: center;
+    max-width: 600px;
+    width: 100%;
 }
 
 .locality-input {
@@ -216,10 +199,20 @@ function toggleTheme() {
     border-radius: 18px;
     border: 1.5px solid #bdbdbd;
     font-size: 1.1rem;
-    width: 270px;
+    width: 100%;
     background: var(--foreground);
     color: var(--text);
     transition: border 0.2s;
+    box-sizing: border-box;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+
+.locality-input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.2);
 }
 
 .welcome-page.darkblue .locality-input {
