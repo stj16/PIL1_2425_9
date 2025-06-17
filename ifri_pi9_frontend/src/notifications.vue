@@ -1,170 +1,158 @@
 <template>
-  <div class="notification-panel">
-    <div class="panel-header">
-      <h3>Notifications</h3>
-      <button class="close-btn" @click="$emit('close')">
-        <i class="fas fa-times"></i>
-      </button>
+  <div class="notifications-container">
+    <div class="notifications-header">
+      <h2>Notifications</h2>
+      <button class="mark-all" @click="markAllAsRead">Tout marquer comme lu</button>
     </div>
-    
-    <div class="notification-list">
-      <div 
-        v-for="notification in notifications" 
-        :key="notification.id" 
-        class="notification-item"
+    <ul class="notifications-list">
+      <li
+        v-for="notification in notifications"
+        :key="notification.id"
         :class="{ unread: !notification.read }"
+        @click="markAsRead(notification)"
       >
-        <div class="notification-icon">
-          <i class="fas fa-bell"></i>
+        <img :src="notification.avatar" class="avatar" alt="avatar" />
+        <div class="content">
+          <span class="message" v-html="notification.message"></span>
+          <span class="time">{{ notification.time }}</span>
         </div>
-        <div class="notification-content">
-          <h4>{{ notification.title }}</h4>
-          <p>{{ notification.content }}</p>
-          <span class="notification-time">{{ notification.time }}</span>
-        </div>
-      </div>
-    </div>
-    
-    <div class="panel-footer">
-      <button class="mark-all-read">Tout marquer comme lu</button>
-    </div>
+        <span v-if="!notification.read" class="dot"></span>
+      </li>
+    </ul>
   </div>
 </template>
 
 <script setup>
-defineProps({
-  notifications: {
-    type: Array,
-    required: true
-  }
-})
+import { ref } from 'vue'
 
-defineEmits(['close'])
+const notifications = ref([
+  {
+    id: 1,
+    avatar: 'https://randomuser.me/api/portraits/men/32.jpg',
+    message: '<b>Ali</b> a aimé votre publication.',
+    time: 'Il y a 2 minutes',
+    read: false,
+  },
+  {
+    id: 2,
+    avatar: 'https://randomuser.me/api/portraits/women/44.jpg',
+    message: '<b>Sara</b> a commenté sur votre photo.',
+    time: 'Il y a 10 minutes',
+    read: false,
+  },
+  {
+    id: 3,
+    avatar: 'https://randomuser.me/api/portraits/men/54.jpg',
+    message: '<b>Mohamed</b> vous a envoyé une demande d\'ami.',
+    time: 'Il y a 1 heure',
+    read: true,
+  },
+])
+
+function markAsRead(notification) {
+  notification.read = true
+}
+
+function markAllAsRead() {
+  notifications.value.forEach(n => (n.read = true))
+}
 </script>
 
 <style scoped>
-.notification-panel {
-  position: fixed;
-  top: 0;
-  right: 0;
-  width: 350px;
-  height: 100vh;
-  background-color: white;
-  box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
-  display: flex;
-  flex-direction: column;
-  z-index: 1000;
+.notifications-container {
+  max-width: 400px;
+  margin: 40px auto;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.08);
+  overflow: hidden;
+  font-family: 'Segoe UI', Arial, sans-serif;
 }
 
-.dark-theme .notification-panel {
-  background-color: #2d2d2d;
-  box-shadow: -5px 0 15px rgba(0, 0, 0, 0.3);
-}
-
-.panel-header {
+.notifications-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem;
-  border-bottom: 1px solid #eee;
+  padding: 18px 24px;
+  border-bottom: 1px solid #f0f2f5;
+  background: #f7f9fa;
 }
 
-.dark-theme .panel-header {
-  border-bottom-color: #444;
-}
-
-.panel-header h3 {
-  margin: 0;
+.notifications-header h2 {
   font-size: 1.2rem;
+  margin: 0;
+  font-weight: 600;
 }
 
-.close-btn {
+.mark-all {
   background: none;
   border: none;
-  font-size: 1.2rem;
+  color: #1877f2;
+  font-weight: 500;
   cursor: pointer;
-  color: inherit;
-}
-
-.notification-list {
-  flex: 1;
-  overflow-y: auto;
-}
-
-.notification-item {
-  display: flex;
-  padding: 1rem;
-  gap: 1rem;
-  border-bottom: 1px solid #eee;
-  transition: background-color 0.2s;
-}
-
-.dark-theme .notification-item {
-  border-bottom-color: #444;
-}
-
-.notification-item:hover {
-  background-color: #f9f9f9;
-}
-
-.dark-theme .notification-item:hover {
-  background-color: #3d3d3d;
-}
-
-.notification-item.unread {
-  background-color: #f0f7ff;
-}
-
-.dark-theme .notification-item.unread {
-  background-color: #1a2b3d;
-}
-
-.notification-icon {
-  font-size: 1.2rem;
-  color: #4a6bff;
-}
-
-.notification-content {
-  flex: 1;
-}
-
-.notification-content h4 {
-  margin: 0 0 0.25rem 0;
   font-size: 0.95rem;
+  transition: color 0.2s;
 }
 
-.notification-content p {
+.mark-all:hover {
+  color: #145db2;
+}
+
+.notifications-list {
+  list-style: none;
   margin: 0;
-  font-size: 0.85rem;
-  color: #666;
+  padding: 0;
 }
 
-.dark-theme .notification-content p {
-  color: #aaa;
-}
-
-.notification-time {
-  display: block;
-  margin-top: 0.25rem;
-  font-size: 0.75rem;
-  color: #999;
-}
-
-.panel-footer {
-  padding: 1rem;
-  border-top: 1px solid #eee;
-  text-align: center;
-}
-
-.dark-theme .panel-footer {
-  border-top-color: #444;
-}
-
-.mark-all-read {
-  background: none;
-  border: none;
-  color: #4a6bff;
+.notifications-list li {
+  display: flex;
+  align-items: center;
+  padding: 16px 24px;
+  border-bottom: 1px solid #f0f2f5;
   cursor: pointer;
-  font-size: 0.9rem;
+  transition: background 0.2s;
+  position: relative;
+}
+
+.notifications-list li.unread {
+  background: #e7f3ff;
+}
+
+.notifications-list li:hover {
+  background: #f0f4fa;
+}
+
+.avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  margin-right: 16px;
+  object-fit: cover;
+  border: 2px solid #e4e6eb;
+}
+
+.content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.message {
+  font-size: 1rem;
+  color: #050505;
+  margin-bottom: 4px;
+}
+
+.time {
+  font-size: 0.85rem;
+  color: #65676b;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  background: #1877f2;
+  border-radius: 50%;
+  margin-left: 12px;
 }
 </style>

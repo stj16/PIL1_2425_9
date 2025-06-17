@@ -1,4 +1,3 @@
-
 <template>
   <div :class="['app-container', { 'dark-theme': darkMode }]">
     <header class="app-header">
@@ -9,163 +8,166 @@
         <router-link to="/messagerie">Messages</router-link>
       </nav>
       <div class="user-controls">
-        <router-link to="/notifications"><button class="notification-badge" @click="toggleNotifications">
-          <i class="fas fa-bell"></i>
-          <span v-if="unreadNotifications" class="badge">{{ unreadNotifications }}</span>
-        </button></router-link>
-        
+        <router-link to="/notifications">
+          <button class="notification-badge" @click="toggleNotifications">
+            <i class="fas fa-bell"></i>
+            <span v-if="unreadNotifications" class="badge">{{ unreadNotifications }}</span>
+          </button>
+        </router-link>
         <div class="user-dropdown" @click="toggleDropdown" ref="dropdown">
           <div class="user-avatar">
-            <img src="/src/assets/imgs/certification.png" alt="Avatar" />
+            <img :src="user.avatar" alt="Avatar" />
             <span class="online-status" :class="{ online: user.isOnline }"></span>
           </div>
           <span class="user-name">{{ user.name }}</span>
           <i class="fas fa-chevron-down"></i>
-          
           <div v-if="dropdownOpen" class="dropdown-menu">
-            <div class="dropdown-item" @click="goToProfile">
-              <i class="fas fa-user"></i> Mon Profil
-            </div>
             <div class="dropdown-item" @click="toggleRole">
               <i class="fas fa-sync-alt"></i> Passer en {{ user.role === 'driver' ? 'Passager' : 'Conducteur' }}
             </div>
             <div class="dropdown-item" @click="toggleTheme">
               <i class="fas fa-moon"></i> {{ darkMode ? 'Thème clair' : 'Thème sombre' }}
             </div>
-            <div class="dropdown-item" @click="goToSettings">
+           <router-link to="/parametre" style="color: violet; text-decoration: none;" class="par"> <div class="dropdown-item">
               <i class="fas fa-cog"></i> Paramètres
-            </div>
+            </div></router-link>
             <div class="dropdown-divider"></div>
-            <div class="dropdown-item logout" @click="logout">
-              <i class="fas fa-sign-out-alt"></i> Déconnexion
+            <div class="dropdown-item logout">
+              <router-link to="/deconnexion" style="color: red; text-decoration: none;"><i class="fas fa-sign-out-alt"></i> Déconnexion</router-link>
             </div>
           </div>
         </div>
       </div>
     </header>
-    <body>
-        <div class="profile-page">
-    <div class="profile-header">
-      <div class="profile-avatar">
-        <img src="/src/assets/imgs/certification.png" alt="Profile" />
-        <span class="online-status" :class="{ online: user.isOnline }"></span>
-        <button class="edit-avatar" @click="editAvatar">
-          <i class="fas fa-camera"></i>
-        </button>
-      </div>
-      <div class="profile-info">
-        <h1>{{ user.name }}</h1>
-        <p class="user-role">
-          <i class="fas" :class="user.role === 'driver' ? 'fa-car' : 'fa-user'"></i>
-          {{ user.role === 'driver' ? 'Conducteur' : 'Passager' }}
-        </p>
-        <p class="user-bio">{{ user.bio || 'Aucune biographie' }}</p>
-      </div>
-       <router-link to="/editprofil" style ="text-decoration:none"> <button class="edit-profile" @click="editProfile">
-        <i class="fas fa-edit"></i> Modifier le profil
-      </button></router-link>
-     
-    </div>
-
-    <div class="profile-content">
-      <div class="profile-section">
-        <h2>À propos</h2>
-        <div class="about-grid">
-          <div class="about-item">
-            <i class="fas fa-envelope"></i>
-            <span>{{ user.email }}</span>
+    <main class="app-main">
+      <div class="profile-page">
+        <div class="profile-header">
+          <div class="profile-avatar">
+            <img :src="user.avatar" alt="Profile" />
+            <span class="online-status" :class="{ online: user.isOnline }"></span>
+            <label class="edit-avatar" for="avatar-upload">
+              <i class="fas fa-camera"></i>
+              <input id="avatar-upload" type="file" accept="image/*" @change="onAvatarChange" style="display:none" />
+            </label>
           </div>
-          <div class="about-item">
-            <i class="fas fa-phone"></i>
-            <span>{{ user.phone || 'Non renseigné' }}</span>
+          <div class="profile-info">
+            <h1>{{ user.name }}</h1>
+            <p class="user-role">
+              <i class="fas" :class="user.role === 'driver' ? 'fa-car' : 'fa-user'"></i>
+              {{ user.role === 'driver' ? 'Conducteur' : 'Passager' }}
+            </p>
+            <p class="user-bio">{{ user.bio || 'Aucune biographie' }}</p>
           </div>
-          <div class="about-item">
-            <i class="fas fa-map-marker-alt"></i>
-            <span>{{ user.location || 'Non renseigné' }}</span>
-          </div>
-          <div class="about-item">
-            <i class="fas fa-calendar-alt"></i>
-            <span>Membre depuis {{ joinDate }}</span>
-          </div>
+          <router-link to="/editprofil" style="text-decoration:none">
+            <button class="edit-profile">
+              <i class="fas fa-edit"></i> Modifier le profil
+            </button>
+          </router-link>
         </div>
-      </div>
-
-      <div class="profile-section">
-        <div class="section-header">
-          <h2>Avis et commentaires</h2>
-          <div class="rating-summary">
-            <div class="stars">
-              <i v-for="n in 5" :key="n" class="fas fa-star" :class="{ filled: n <= averageRating }"></i>
+        <div class="profile-content">
+          <div class="profile-section">
+            <h2>À propos</h2>
+            <div class="about-grid">
+              <div class="about-item">
+                <i class="fas fa-envelope"></i>
+                <span>{{ user.email }}</span>
+              </div>
+              <div class="about-item">
+                <i class="fas fa-phone"></i>
+                <span>{{ user.phone || 'Non renseigné' }}</span>
+              </div>
+              <div class="about-item">
+                <i class="fas fa-map-marker-alt"></i>
+                <span>{{ user.location || 'Non renseigné' }}</span>
+              </div>
+              <div class="about-item">
+                <i class="fas fa-calendar-alt"></i>
+                <span>Membre depuis {{ joinDate }}</span>
+              </div>
+              <template v-if="user.role === 'driver'">
+                <div class="about-item">
+                  <i class="fas fa-car"></i>
+                  <span>Nom du véhicule : {{ user.vehicleName || 'Non renseigné' }}</span>
+                </div>
+                <div class="about-item">
+                  <i class="fas fa-id-card"></i>
+                  <span>Numéro de série : {{ user.vehicleSerial || 'Non renseigné' }}</span>
+                </div>
+                <div class="about-item">
+                  <i class="fas fa-industry"></i>
+                  <span>Marque : {{ user.vehicleBrand || 'Non renseigné' }}</span>
+                </div>
+                <div class="about-item">
+                  <i class="fas fa-palette"></i>
+                  <span>Couleur : {{ user.vehicleColor || 'Non renseigné' }}</span>
+                </div>
+                <div class="about-item">
+                  <i class="fas fa-tachometer-alt"></i>
+                  <span>Année : {{ user.vehicleYear || 'Non renseigné' }}</span>
+                </div>
+                <div class="about-item">
+                  <i class="fas fa-users"></i>
+                  <span>Nombre de places : {{ user.vehicleSeats || 'Non renseigné' }}</span>
+                </div>
+                <div class="about-item">
+                  <i class="fas fa-certificate"></i>
+                  <span>Assurance : {{ user.vehicleInsurance || 'Non renseigné' }}</span>
+                </div>
+              </template>
             </div>
-            <span class="rating-text">{{ averageRating.toFixed(1) }} ({{ reviews.length }} avis)</span>
           </div>
-        </div>
-
-        <div class="reviews-list">
-          <div v-for="review in reviews" :key="review.id" class="review-card">
-            <div class="review-header">
-              <img :src="review.author.avatar" alt="Reviewer" class="reviewer-avatar" />
-              <div class="reviewer-info">
-                <h4>{{ review.author.name }}</h4>
-                <div class="review-rating">
-                  <i v-for="n in 5" :key="n" class="fas fa-star" :class="{ filled: n <= review.rating }"></i>
+          <div class="profile-section">
+            <div class="section-header">
+              <h2>Avis et commentaires</h2>
+              <div class="rating-summary">
+                <div class="stars">
+                  <i v-for="n in 5" :key="n" class="fas fa-star" :class="{ filled: n <= averageRating }"></i>
+                </div>
+                <span class="rating-text">{{ averageRating.toFixed(1) }} ({{ reviews.length }} avis)</span>
+              </div>
+            </div>
+            <div class="reviews-list">
+              <div v-for="review in reviews" :key="review.id" class="review-card">
+                <div class="review-header">
+                  <img :src="review.author.avatar" alt="Reviewer" class="reviewer-avatar" />
+                  <div class="reviewer-info">
+                    <h4>{{ review.author.name }}</h4>
+                    <div class="review-rating">
+                      <i v-for="n in 5" :key="n" class="fas fa-star" :class="{ filled: n <= review.rating }"></i>
+                    </div>
+                  </div>
+                  <span class="review-date">{{ review.date }}</span>
+                </div>
+                <p class="review-content">{{ review.content }}</p>
+                <div v-if="review.response" class="review-response">
+                  <strong>Réponse :</strong> {{ review.response }}
                 </div>
               </div>
-              <span class="review-date">{{ review.date }}</span>
-            </div>
-            <p class="review-content">{{ review.content }}</p>
-            <div v-if="review.response" class="review-response">
-              <strong>Réponse :</strong> {{ review.response }}
             </div>
           </div>
         </div>
       </div>
-    </div>
-
-    <ProfileEditor 
-      v-if="editingProfile" 
-      :user="users" 
-      @save="saveProfile" 
-      @cancel="editingProfile = false" 
-    />
-  </div>
-    </body>
-    <main class="app-main">
-      <router-view />
+      <NotificationPanel 
+        v-if="showNotifications" 
+        @close="toggleNotifications" 
+        :notifications="notifications"
+      />
     </main>
-
-    <NotificationPanel 
-      v-if="showNotifications" 
-      @close="toggleNotifications" 
-      :notifications="notifications"
-    />
   </div>
 </template>
 
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import { useRouter } from 'vue-router'
-
+import Editprofil from './editprofil.vue'
 
 const router = useRouter()
 
-// État de l'utilisateur
-const users = ref({
-  id: 1,
-  name: 'Jean Dupont',
-  avatar: 'https://randomuser.me/api/portraits/men/32.jpg',
-  role: 'driver', // 'driver' ou 'passenger'
-  isOnline: true,
-  lastSeen: null
-})
-
-// État de l'interface
 const darkMode = ref(false)
 const dropdownOpen = ref(false)
 const showNotifications = ref(false)
 const unreadNotifications = ref(3)
 
-// Notifications simulées
 const notifications = ref([
   { id: 1, title: 'Nouveau message', content: 'Vous avez reçu un message de Marie', read: false, time: '10 min' },
   { id: 2, title: 'Réservation confirmée', content: 'Votre trajet du 15 juin est confirmé', read: false, time: '1h' },
@@ -173,18 +175,71 @@ const notifications = ref([
   { id: 4, title: 'Paiement effectué', content: 'Votre paiement de 15€ a été accepté', read: true, time: '1j' }
 ])
 
-// Computed properties
+const user = ref({
+  id: 1,
+  name: 'Asimc Amoussou',
+  avatar: '/src/assets/imgs/certification.png',
+  role: 'driver',
+  isOnline: true,
+  bio: 'Conducteur expérimenté avec 5 ans de covoiturage 😁',
+  email: 'asimcamoussou@gmail.com',
+  phone: '+229 47799236',
+  location: 'Cotonou, Benin',
+  joinedAt: '2023-06-13',
+  vehicleName: 'Toyota Corolla',
+  vehicleSerial: 'ABC123456789',
+  vehicleBrand: 'Toyota',
+  vehicleColor: 'Gris',
+  vehicleYear: '2018',
+  vehicleSeats: 5,
+  vehicleInsurance: 'AXA Assurance'
+})
 
-// Méthodes
+const reviews = ref([
+  {
+    id: 1,
+    author: {
+      name: 'Nethania',
+      avatar: '/src/assets/imgs/zem.jpg'
+    },
+    rating: 5,
+    date: '15 mai 2024',
+    content: 'Trajet très agréable avec Asimc, ponctuel et sympathique !',
+    response: 'Merci Nethania, ce fut un plaisir de voyager avec vous aussi.'
+  },
+  {
+    id: 2,
+    author: {
+      name: 'Gaby DOSSA',
+      avatar: '/src/assets/imgs/epac.png'
+    },
+    rating: 4,
+    date: '2 avril 2024',
+    content: 'Bon conducteur, voiture confortable. Un peu de retard mais compréhensible.',
+    response: 'Merci pour votre compréhension !'
+  }
+])
+
+const averageRating = computed(() => {
+  if (reviews.value.length === 0) return 0
+  const sum = reviews.value.reduce((acc, review) => acc + review.rating, 0)
+  return sum / reviews.value.length
+})
+
+const joinDate = computed(() => {
+  const options = { year: 'numeric', month: 'long' }
+  return new Date(user.value.joinedAt).toLocaleDateString('fr-FR', options)
+})
+
 const toggleDropdown = () => {
   dropdownOpen.value = !dropdownOpen.value
 }
 
 const toggleNotifications = () => {
   showNotifications.value = !showNotifications.value
-  // Marquer comme lues quand on ouvre
   if (showNotifications.value) {
     notifications.value.forEach(n => n.read = true)
+    unreadNotifications.value = 0
   }
 }
 
@@ -195,7 +250,6 @@ const toggleTheme = () => {
 
 const toggleRole = () => {
   user.value.role = user.value.role === 'driver' ? 'passenger' : 'driver'
-  // Ici, vous pourriez appeler une API pour mettre à jour le rôle
 }
 
 const goToProfile = () => {
@@ -209,104 +263,37 @@ const goToSettings = () => {
 }
 
 const logout = () => {
-  // Logique de déconnexion
-  console.log('Déconnexion')
   router.push('/login')
 }
 
-// Gestion du clic en dehors du dropdown
 const handleClickOutside = (event) => {
   if (dropdownOpen.value && !event.target.closest('.user-dropdown')) {
     dropdownOpen.value = false
   }
 }
 
-// Lifecycle hooks
 onMounted(() => {
-  // Récupérer le thème depuis le localStorage
   const savedTheme = localStorage.getItem('darkMode')
   if (savedTheme !== null) {
     darkMode.value = savedTheme === 'true'
   }
-  
-  // Écouter les clics pour fermer le dropdown
   document.addEventListener('click', handleClickOutside)
-  
-  // Simuler la présence en ligne
-  user.value.isOnline = true
-  user.value.lastSeen = new Date()
 })
 
 onBeforeUnmount(() => {
   document.removeEventListener('click', handleClickOutside)
 })
 
-
-const user = ref({
-  id: 1,
-  name: 'Asimc',
-  avatar: 'https://randomuser.me/api/portraits/men/32.jpg',
-  role: 'driver',
-  isOnline: true,
-  bio: 'Conducteur expérimenté avec 5 ans de covoiturage😁',
-  email: 'asimcamoussou@gmail.com',
-  phone: '+229 47799236',
-  location: 'Cotonou, Benin',
-  joinedAt: '2025-06-13'
-})
-
-const reviews = ref([
-  {
-    id: 1,
-    author: {
-      name: 'Nethania',
-      avatar: '/src/assets/imgs/zem.jpg'
-    },
-    rating: 5,
-    date: '15 mai 2025',
-    content: 'Trajet très agréable avec Asimc, ponctuel et sympathique !',
-    response: 'Merci Nethania, ce fut un plaisir de voyager avec vous aussi.'
-  },
-  {
-    id: 2,
-    author: {
-      name: 'Gaby DOSSA',
-      avatar: '/src/assets/imgs/epac.png'
-    },
-    rating: 4,
-    date: '2 avril 2025',
-    content: 'Bon conducteur, voiture confortable. Un peu de retard mais compréhensible.',
-    response: 'ouais gblewa is everywhere😏'
+function onAvatarChange(e) {
+  const file = e.target.files[0]
+  if (file) {
+    const reader = new FileReader()
+    reader.onload = (ev) => {
+      user.value.avatar = ev.target.result
+    }
+    reader.readAsDataURL(file)
   }
-])
-
-const editingProfile = ref(false)
-
-const averageRating = computed(() => {
-  if (reviews.value.length === 0) return 0
-  const sum = reviews.value.reduce((acc, review) => acc + review.rating, 0)
-  return sum / reviews.value.length
-})
-
-const joinDate = computed(() => {
-  const options = { year: 'numeric', month: 'long' }
-  return new Date(user.value.joinedAt).toLocaleDateString('fr-FR', options)
-})
-
-const editProfile = () => {
-  editingProfile.value = true
 }
-
-const editAvatar = () => {
-  // Logique pour changer l'avatar
-  console.log('Changer l\'avatar')
-}
-
-const saveProfile = (updatedUser) => {
-  user.value = { ...user.value, ...updatedUser }
-  editingProfile.value = false
-}
-
 </script>
 
 <style scoped>
@@ -314,13 +301,14 @@ const saveProfile = (updatedUser) => {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background-color: #f5f5f5;
-  color: #333;
-  transition: background-color 0.3s, color 0.3s;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  color: #222;
+  transition: background 0.3s, color 0.3s;
+  font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
 }
 
 .app-container.dark-theme {
-  background-color: #000000;
+  background: linear-gradient(135deg, #232526 0%, #414345 100%);
   color: #f0f0f0;
 }
 
@@ -328,28 +316,32 @@ const saveProfile = (updatedUser) => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem 2rem;
-  background-color: #ffffff;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  padding: 1.2rem 2.5rem;
+  background: #fff;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.08);
   position: sticky;
   top: 0;
   z-index: 100;
+  border-bottom: 1px solid #e6e6e6;
 }
 
 .dark-theme .app-header {
-  background-color: #000000;
-  box-shadow: 0 1px 5px rgba(255, 255, 255, 0.637);
+  background: #232526;
+  border-bottom: 1px solid #444;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.25);
 }
 
 .logo {
-  font-size: 1.5rem;
+  font-size: 2rem;
   font-weight: bold;
-  color: orangered;
+  color: #ff4a2b;
+  letter-spacing: 2px;
+  text-shadow: 1px 1px 0 #fff, 2px 2px 4px #e6e6e6;
 }
 
 .main-nav {
   display: flex;
-  gap: 1.5rem;
+  gap: 2rem;
 }
 
 .main-nav a {
@@ -358,41 +350,48 @@ const saveProfile = (updatedUser) => {
   font-weight: 500;
   padding: 0.5rem 0;
   position: relative;
-  transition: transform 0.3s ease-in;
+  font-size: 1.1rem;
+  transition: color 0.2s, transform 0.2s;
 }
 .main-nav a:hover{
-transform: scaleX(1.1);
-color: #4a6bff;
+  color: #4a6bff;
+  transform: scale(1.08);
 }
 
 .main-nav a.router-link-active {
   color: #4a6bff;
+  font-weight: 600;
 }
 
 .main-nav a.router-link-active::after {
   content: '';
   position: absolute;
-  bottom: 0;
+  bottom: -4px;
   left: 0;
   width: 100%;
-  height: 2px;
+  height: 2.5px;
   background-color: #4a6bff;
+  border-radius: 2px;
 }
 
 .user-controls {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 1.2rem;
 }
 
 .notification-badge {
   background: none;
   border: none;
-  font-size: 1.2rem;
+  font-size: 1.3rem;
   color: inherit;
   position: relative;
   cursor: pointer;
   padding: 0.5rem;
+  transition: color 0.2s;
+}
+.notification-badge:hover {
+  color: #4a6bff;
 }
 
 .badge {
@@ -408,159 +407,164 @@ color: #4a6bff;
   display: flex;
   align-items: center;
   justify-content: center;
+  border: 2px solid #fff;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.12);
 }
 
 .user-dropdown {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.7rem;
   cursor: pointer;
   position: relative;
-  padding: 0.5rem;
+  padding: 0.5rem 1rem 0.5rem 0.5rem;
   border-radius: 50px;
   transition: background-color 0.2s;
+  background: transparent;
 }
-
 .user-dropdown:hover {
-  background-color: rgba(0, 0, 0, 0.05);
+  background-color: rgba(74, 107, 255, 0.07);
 }
-
 .dark-theme .user-dropdown:hover {
-  background-color: rgba(255, 255, 255, 0.05);
+  background-color: rgba(255,255,255,0.07);
 }
 
 .user-avatar {
   position: relative;
 }
-
 .user-avatar img {
-  width: 36px;
-  height: 36px;
+  width: 38px;
+  height: 38px;
   border-radius: 50%;
   object-fit: cover;
+  border: 2px solid #4a6bff;
+  background: #fff;
 }
-
 .online-status {
   position: absolute;
-  bottom: 0;
-  right: 0;
-  width: 10px;
-  height: 10px;
+  bottom: 2px;
+  right: 2px;
+  width: 11px;
+  height: 11px;
   border-radius: 50%;
   background-color: #ccc;
-  border: 2px solid white;
+  border: 2px solid #fff;
 }
-
 .online-status.online {
   background-color: #2ecc71;
 }
 
 .user-name {
   font-weight: 500;
+  font-size: 1rem;
 }
 
 .dropdown-menu {
   position: absolute;
-  top: 100%;
+  top: 110%;
   right: 0;
-  background-color: white;
-  border-radius: 8px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-  min-width: 200px;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+  min-width: 210px;
   overflow: hidden;
   z-index: 1000;
   margin-top: 0.5rem;
+  border: 1px solid #e6e6e6;
 }
-
 .dark-theme .dropdown-menu {
-  background-color: #3d3d3d;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  background: #35363a;
+  border: 1px solid #444;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.35);
 }
 
 .dropdown-item {
-  padding: 0.75rem 1rem;
+  padding: 0.85rem 1.2rem;
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.85rem;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: background-color 0.18s;
+  font-size: 1rem;
 }
-
 .dropdown-item:hover {
   background-color: #f5f5f5;
 }
-
 .dark-theme .dropdown-item:hover {
-  background-color: #4d4d4d;
+  background-color: #444;
 }
-
 .dropdown-item i {
-  width: 20px;
+  width: 22px;
   text-align: center;
+  font-size: 1.1rem;
 }
-
 .dropdown-divider {
   height: 1px;
   background-color: #eee;
   margin: 0.25rem 0;
 }
-
 .dark-theme .dropdown-divider {
   background-color: #555;
 }
-
 .dropdown-item.logout {
   color: #ff4757;
 }
 
 .app-main {
   flex: 1;
-  padding: 2rem;
+  padding: 2.5rem 0.5rem 2.5rem 0.5rem;
+  background: transparent;
 }
 
 .profile-page {
-  max-width: 900px;
+  max-width: 950px;
   margin: 0 auto;
-  padding: 2rem 1rem;
+  padding: 2.5rem 1.5rem;
 }
 
 .profile-header {
   display: flex;
   align-items: flex-start;
-  gap: 2rem;
-  margin-bottom: 3rem;
+  gap: 2.5rem;
+  margin-bottom: 3.5rem;
   position: relative;
+  background: rgba(255,255,255,0.85);
+  border-radius: 18px;
+  box-shadow: 0 2px 16px rgba(74,107,255,0.06);
+  padding: 2rem 2.5rem;
+}
+.dark-theme .profile-header {
+  background: rgba(53,54,58,0.95);
+  box-shadow: 0 2px 16px rgba(74,107,255,0.12);
 }
 
 .profile-avatar {
   position: relative;
-  width: 120px;
-  height: 120px;
+  width: 130px;
+  height: 130px;
+  min-width: 130px;
 }
-
 .profile-avatar img {
   width: 100%;
   height: 100%;
   border-radius: 50%;
   object-fit: cover;
-  border: 4px solid #4a6bff;
+  border: 5px solid #4a6bff;
+  background: #fff;
 }
-
 .online-status {
   position: absolute;
-  bottom: 10px;
-  right: 10px;
-  width: 16px;
-  height: 16px;
+  bottom: 13px;
+  right: 13px;
+  width: 18px;
+  height: 18px;
   border-radius: 50%;
   background-color: #ccc;
-  border: 2px solid white;
+  border: 2.5px solid #fff;
 }
-
 .online-status.online {
   background-color: #2ecc71;
 }
-
 .edit-avatar {
   position: absolute;
   bottom: 0;
@@ -568,93 +572,128 @@ color: #4a6bff;
   background-color: #4a6bff;
   color: white;
   border: none;
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  box-shadow: 0 2px 8px rgba(74,107,255,0.18);
+  font-size: 1.2rem;
+  border: 2px solid #fff;
+  transition: background 0.2s;
+}
+.edit-avatar:hover {
+  background: #3551c9;
 }
 
 .profile-info {
   flex: 1;
+  min-width: 0;
 }
-
 .profile-info h1 {
   margin: 0 0 0.5rem 0;
-  font-size: 1.8rem;
+  font-size: 2.1rem;
+  font-weight: 700;
+  letter-spacing: 1px;
 }
-
 .user-role {
-  margin: 0 0 1rem 0;
-  color: #666;
+  margin: 0 0 1.2rem 0;
+  color: #4a6bff;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.7rem;
+  font-size: 1.1rem;
+  font-weight: 500;
 }
-
 .dark-theme .user-role {
-  color: #aaa;
+  color: #aabfff;
 }
-
 .user-bio {
   margin: 1rem 0;
-  line-height: 1.5;
+  line-height: 1.6;
+  color: #555;
+  font-size: 1.05rem;
 }
-
+.dark-theme .user-bio {
+  color: #ccc;
+}
 .edit-profile {
   background-color: #4a6bff;
   color: white;
   border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 5px;
+  padding: 0.55rem 1.2rem;
+  border-radius: 7px;
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.6rem;
   font-weight: 500;
+  font-size: 1rem;
+  box-shadow: 0 2px 8px rgba(74,107,255,0.12);
+  transition: background 0.2s;
+}
+.edit-profile:hover {
+  background: #3551c9;
 }
 
 .profile-content {
   display: grid;
-  gap: 2rem;
+  gap: 2.2rem;
 }
 
 .profile-section {
-  background-color: white;
-  border-radius: 10px;
-  padding: 1.5rem;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  background: rgba(255,255,255,0.95);
+  border-radius: 14px;
+  padding: 2rem 2.2rem;
+  box-shadow: 0 2px 16px rgba(74,107,255,0.07);
+  margin-bottom: 0.5rem;
 }
-
 .dark-theme .profile-section {
-  background-color: #2d2d2d;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  background: rgba(53,54,58,0.98);
+  box-shadow: 0 2px 16px rgba(74,107,255,0.18);
 }
 
 .profile-section h2 {
   margin-top: 0;
-  margin-bottom: 1.5rem;
-  font-size: 1.3rem;
+  margin-bottom: 1.7rem;
+  font-size: 1.35rem;
+  font-weight: 600;
+  color: #4a6bff;
+  letter-spacing: 0.5px;
 }
-
+.dark-theme .profile-section h2 {
+  color: #aabfff;
+}
+.dark-theme .par{
+  color: black;
+}
 .about-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1.7rem;
 }
-
 .about-item {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 1.1rem;
+  font-size: 1.05rem;
+  color: #333;
+  background: #f7f9fa;
+  border-radius: 7px;
+  padding: 0.7rem 1rem;
+  box-shadow: 0 1px 4px rgba(74,107,255,0.04);
 }
-
+.dark-theme .about-item {
+  background: #2d2e32;
+  color: #eee;
+  box-shadow: 0 1px 4px rgba(74,107,255,0.09);
+}
 .about-item i {
-  font-size: 1.2rem;
+  font-size: 1.25rem;
   color: #4a6bff;
-  width: 24px;
+  width: 26px;
   text-align: center;
 }
 
@@ -662,94 +701,125 @@ color: #4a6bff;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.7rem;
 }
 
 .rating-summary {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.7rem;
 }
-
 .stars {
   color: #ccc;
+  font-size: 1.1rem;
 }
-
 .stars .filled {
   color: #ffcc00;
 }
-
 .rating-text {
-  font-size: 0.9rem;
+  font-size: 1rem;
   color: #666;
+  font-weight: 500;
 }
-
 .dark-theme .rating-text {
   color: #aaa;
 }
 
 .reviews-list {
   display: grid;
-  gap: 1.5rem;
+  gap: 1.7rem;
 }
 
 .review-card {
-  background-color: #f9f9f9;
-  border-radius: 8px;
-  padding: 1.5rem;
+  background: #f9f9fb;
+  border-radius: 10px;
+  padding: 1.6rem 1.3rem;
+  box-shadow: 0 1px 6px rgba(74,107,255,0.04);
+  border-left: 4px solid #4a6bff;
 }
-
 .dark-theme .review-card {
-  background-color: #3d3d3d;
+  background: #35363a;
+  border-left: 4px solid #aabfff;
 }
 
 .review-header {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 1.1rem;
   margin-bottom: 1rem;
 }
-
 .reviewer-avatar {
-  width: 50px;
-  height: 50px;
+  width: 52px;
+  height: 52px;
   border-radius: 50%;
   object-fit: cover;
+  border: 2px solid #4a6bff;
+  background: #fff;
 }
-
 .reviewer-info {
   flex: 1;
 }
-
 .reviewer-info h4 {
   margin: 0 0 0.25rem 0;
+  font-size: 1.08rem;
+  font-weight: 600;
 }
-
 .review-rating {
   color: #ffcc00;
+  font-size: 1.05rem;
 }
-
 .review-date {
-  font-size: 0.8rem;
+  font-size: 0.92rem;
   color: #999;
+  font-weight: 500;
 }
-
 .review-content {
   margin: 0;
-  line-height: 1.5;
+  line-height: 1.6;
+  color: #444;
+  font-size: 1.05rem;
 }
-
+.dark-theme .review-content {
+  color: #eee;
+}
 .review-response {
-  margin-top: 1rem;
-  padding-top: 1rem;
+  margin-top: 1.1rem;
+  padding-top: 1.1rem;
   border-top: 1px solid #eee;
-  font-size: 0.9rem;
+  font-size: 0.98rem;
   color: #666;
 }
-
 .dark-theme .review-response {
   border-top-color: #555;
-  color: #aaa;
+  color: #aabfff;
 }
 
+/* Responsive */
+@media (max-width: 900px) {
+  .profile-header {
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 1.5rem 1rem;
+  }
+  .profile-content {
+    padding: 0;
+  }
+  .profile-section {
+    padding: 1.2rem 0.7rem;
+  }
+}
+@media (max-width: 600px) {
+  .app-header {
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1rem 0.5rem;
+  }
+  .profile-page {
+    padding: 1rem 0.2rem;
+  }
+  .profile-header {
+    padding: 1rem 0.2rem;
+  }
+}
 </style>

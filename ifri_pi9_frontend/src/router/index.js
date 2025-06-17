@@ -156,6 +156,32 @@ const routes = [
         ],
         
     },
+    {
+        path:'',
+        redirect:{ name: 'Welcome'},
+        children: [
+            {
+                path:'Welcome',
+                name: 'Welcome',
+                component: () => import ('../Welcome.vue'),
+
+            },
+        ],
+        
+    },
+    {
+        path:'',
+        redirect:{ name: 'authentification'},
+        children: [
+            {
+                path:'authentification',
+                name: 'authentification',
+                component: () => import ('../authentification.vue'),
+
+            },
+        ],
+        
+    },
 ];
 
 const router = createRouter({
