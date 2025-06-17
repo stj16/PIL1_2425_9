@@ -1,11 +1,11 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import msgListecreateview, msgDetailview
+from .views import msgViewSet # Import msgViewSet, remove others
 
 router = DefaultRouter()
-router.register(r'', msgListecreateview, basename='msg')
+# Register msgViewSet with 'messages' prefix and 'message' basename
+router.register(r'messages', msgViewSet, basename='message')
 
 urlpatterns = [
-    *router.urls,
-    path('<int:pk>/', msgDetailview.as_view(), name='msg-detail'),
+    path('', include(router.urls)), # Use include() for router.urls
 ]

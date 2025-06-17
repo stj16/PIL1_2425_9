@@ -49,10 +49,19 @@ class User(AbstractBaseUser, PermissionsMixin):
     prenom = models.CharField(max_length=100)
     username = models.CharField(max_length=100)
     role = models.CharField(max_length=20, choices=ROLE_CHOICES)
-    phone_number = PhoneNumberField(blank=True, null=True, region='BJ')  
+    phone_number = PhoneNumberField(blank=True, null=True, region='BJ', unique=True)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     photo = models.ImageField(upload_to='photos/', blank=True, null=True)
+    point_depart_habituel = models.CharField(max_length=255, blank=True, null=True, verbose_name="Point de départ habituel")
+    latitude_depart_habituel = models.FloatField(blank=True, null=True, verbose_name="Latitude départ habituel")
+    longitude_depart_habituel = models.FloatField(blank=True, null=True, verbose_name="Longitude départ habituel")
+    horaires_depart_habituel = models.CharField(max_length=50, blank=True, null=True, verbose_name="Horaires de départ habituels")
+    horaires_arrivee_habituel = models.CharField(max_length=50, blank=True, null=True, verbose_name="Horaires d'arrivée habituels")
+    marque_vehicule = models.CharField(max_length=100, blank=True, null=True, verbose_name="Marque du véhicule")
+    modele_vehicule = models.CharField(max_length=100, blank=True, null=True, verbose_name="Modèle du véhicule")
+    couleur_vehicule = models.CharField(max_length=50, blank=True, null=True, verbose_name="Couleur du véhicule")
+    nombre_places_vehicule = models.PositiveIntegerField(default=1, blank=True, null=True, verbose_name="Nombre de places véhicule")
     
 
 

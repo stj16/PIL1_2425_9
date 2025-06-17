@@ -20,9 +20,9 @@ from django.conf import settings
 from django.conf.urls.static import static
 urlpatterns = [
     path('admin/', admin.site.urls),
-   path('offer/', include('ifri_pi9_backend.offer.urls')),
-    path('msg/', include('ifri_pi9_backend.msg.urls')),
-    path('request/', include('ifri_pi9_backend.request.urls')),
-    path('account/', include('ifri_pi9_backend.account.urls')),
-    path('forgotpassword/', include('ifri_pi9_backend.forgotpassword.urls')),
+   path('offer/', include('offer.urls')),
+    path('msg/', include('msg.urls')),
+    path('request/', include('request.urls')),
+    path('account/', include('account.urls')),
+    path('forgotpassword/', include('forgotpassword.urls')),
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -11,8 +11,7 @@ if str(BASE_DIR) not in sys.path:
     sys.path.append(str(BASE_DIR))
 
 # Importer après avoir configuré le PYTHONPATH
-from routing import websocket_urlpatterns
-from msg.consumers import ChatConsumer
+from routing import websocket_urlpatterns # ChatConsumer import removed as it's unused here
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
 

@@ -6,3 +6,10 @@ psycopg2-binary==2.9.10
 psycopg2-pool==1.2
 sqlparse==0.5.3
 tzdata==2025.2
+djangorestframework-simplejwt
+channels
+django-cors-headers
+django-phonenumber-field
+phonenumbers
+requests
+Pillow

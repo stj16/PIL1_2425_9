@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.http import urlsafe_base64_decode
-from ifri_pi9_backend.account.models import User
+from account.models import User
 from .serializer import ResetPasswordSerializer
 
 class ResetPasswordView(APIView):

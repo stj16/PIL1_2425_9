@@ -39,13 +39,13 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     
     # Apps locales
-    'ifri_pi9_backend.api',
-    'ifri_pi9_backend.offer',
-    'ifri_pi9_backend.request',
-    'ifri_pi9_backend.msg',
-    'ifri_pi9_backend.account',
-    'ifri_pi9_backend.forgotpassword',
-    'ifri_pi9_backend.config',
+    'api',
+    'offer',
+    'request',
+    'msg',
+    'account',
+    'forgotpassword',
+    'config',
     
     
     
@@ -63,10 +63,10 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'ifri_pi9_backend.account.middleware.JWTAuthenticationMiddleware',  # Notre middleware personnalisé
+    'account.middleware.JWTAuthenticationMiddleware',  # Notre middleware personnalisé
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'ifri_pi9_backend.offer.middleware.CorsMiddleware',  # Notre middleware CORS personnalisé
+    'offer.middleware.CorsMiddleware',  # Notre middleware CORS personnalisé
 ]
 
 # Configuration CORS
@@ -105,7 +105,7 @@ CSRF_COOKIE_SECURE = not DEBUG
 CSRF_COOKIE_HTTPONLY = True
 CSRF_TRUSTED_ORIGINS = ['http://localhost:5173', 'http://127.0.0.1:5173']
 
-ROOT_URLCONF = 'ifri_pi9_backend.config.urls'
+ROOT_URLCONF = 'config.urls'
 
 TEMPLATES = [
     {
@@ -122,7 +122,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'ifri_pi9_backend.config.wsgi.application'
+WSGI_APPLICATION = 'config.wsgi.application'
 
 
 # Database
@@ -180,7 +180,7 @@ STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'ifri_pi9_backend/static'),
+    os.path.join(BASE_DIR, 'static'),
 
 ]  # Make sure this directory exists, or create it.
 
@@ -194,7 +194,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Configuration ASGI pour Django Channels
-ASGI_APPLICATION = 'ifri_pi9_backend.asgi.application'
+ASGI_APPLICATION = 'asgi.application'
 
 # Configuration des canaux pour Redis
 CHANNEL_LAYERS = {
@@ -205,7 +205,7 @@ CHANNEL_LAYERS = {
         },
     },
 }
-AUTH_USER_MODEL = 'ifri_pi9_backend.account.User'  
+AUTH_USER_MODEL = 'account.User'
 
 
 from datetime import timedelta
