@@ -33,8 +33,6 @@
 </template>
 
 <script>
-//import axios from 'axios'; // Assurez-vous d'avoir Axios installé (npm install axios)
-
 export default {
   name: 'ForgotPassword',
   data() {
@@ -48,7 +46,7 @@ export default {
   },
   methods: {
     validateEmail(email) {
-      // Regex simple pour la validation d'email
+      
       const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
       return re.test(String(email).toLowerCase());
     },
@@ -74,7 +72,7 @@ export default {
       try {
         const response = await axios.post('/api/forgot-password', { email: this.email });
         this.successMessage = response.data.message || 'Un lien de réinitialisation a été envoyé à votre adresse e-mail.';
-        this.email = ''; // Vider le champ après succès
+        this.email = ''; 
       } catch (error) {
         // Gérer les erreurs de l'API
         if (error.response && error.response.data && error.response.data.message) {

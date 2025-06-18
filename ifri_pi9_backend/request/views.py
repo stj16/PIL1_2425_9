@@ -8,6 +8,9 @@ from .permissions import IsOwnerOrReadOnly
 class carrequestList(generics.ListCreateAPIView):
     queryset = carrequest.objects.all()
     serializer_class = carrequestSerializer
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
     
 
 class carrequestViewSet(viewsets.ModelViewSet):

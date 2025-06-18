@@ -12,9 +12,37 @@ from .permissions import IsOwnerOrReadOnly
 
 # Create your views here.
 class carofferList(generics.ListCreateAPIView):
-    queryset = caroffer.objects.all()
     serializer_class = carofferSerializer
-    
+
+    def get_queryset(self):
+        queryset = caroffer.objects.all()
+        locality = self.request.query_params.get('locality')
+        if locality:
+            from django.db.models import Q
+            queryset = queryset.filter(
+                Q(depart__icontains=locality) |
+                Q(arrive__icontains=locality)
+            )
+        return queryset
+
+
+class carofferList(generics.ListCreateAPIView):
+    serializer_class = carofferSerializer
+
+    def get_queryset(self):
+        queryset = caroffer.objects.all()
+        locality = self.request.query_params.get('locality')
+        if locality:
+            from django.db.models import Q
+            queryset = queryset.filter(
+                Q(depart__icontains=locality) |
+                Q(arrive__icontains=locality)
+            )
+        return queryset
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
 
 
 

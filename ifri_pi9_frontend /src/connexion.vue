@@ -37,7 +37,7 @@ export default {
         const res = await login(this.login.email, this.login.password);
         localStorage.setItem('access', res.data.access);
         localStorage.setItem('refresh', res.data.refresh);
-        this.$router.push('/acceuil');
+        this.$router.push('/welcome'); // Redirection après connexion
       } catch (err) {
         this.errorMsg = 'Identifiants invalides';
       }
@@ -45,6 +45,7 @@ export default {
     async handleRegister() {
       this.registerMsg = '';
       this.errorMsg = '';
+     
       if (this.register.password !== this.register.confirmpassword) {
         this.errorMsg = 'Les mots de passe ne correspondent pas';
         return;
@@ -59,7 +60,7 @@ export default {
       };
       try {
         await register(payload);
-        this.registerMsg = 'Inscription réussie ! Connectez-vous.';
+        this.registerMsg = "Inscription réussie ! Connectez-vous.";
         this.activeTab = 'login';
         this.register = {
           email: '', username: '', nom: '', prenom: '', role: '', password: '', confirmpassword: ''
@@ -76,18 +77,14 @@ export default {
 
 <template>
   <div class="auth-page">
-    <!-- Fond avec effet de flou -->
     <div class="background"></div>
 
-    <!-- Container principal -->
+
     <div class="auth-container">
-      <!-- En-tête -->
       <div class="header">
         <h1>GO-IFRI</h1>
         <p class="tagline">Votre solution de transport premium</p>
       </div>
-
-      <!-- Onglets -->
       <div class="tabs">
         <button @click="activeTab = 'login'" :class="{ active: activeTab === 'login', 'tab-button': true }"
           :style="activeTab === 'login' ? activeTabStyle : ''">
@@ -102,10 +99,7 @@ export default {
             :style="activeTab === 'acceuil' ? activeTabStyle : ''">Back</button>
         </router-link>
       </div>
-
-      <!-- Formulaire avec effet de verre -->
       <div class="form-glass">
-        <!-- Connexion -->
         <form v-if="activeTab === 'login'" @submit.prevent="handleLogin" class="login-form">
           <div class="input-group">
             <input type="email" v-model="login.email" placeholder="Email" required>
@@ -120,61 +114,54 @@ export default {
             </label>
             <router-link to="/motdepasseoublier" class="forgot-password">Mot de passe oublié ?</router-link>
           </div>
-          <button type="submit" class="submit-btn" :class="{ clicked: loginClicked }" @mousedown="loginClicked = true"
-            @mouseup="loginClicked = false" @mouseleave="loginClicked = false">
+
+          <button 
+            type="submit" 
+            class="submit-btn"
+            :class="{ clicked: loginClicked }"
+            @mousedown="loginClicked = true"
+            @mouseup="loginClicked = false"
+            @mouseleave="loginClicked = false"
+          >
             Se connecter
           </button>
         </form>
-
-        <!-- Inscription -->
         <form v-else @submit.prevent="handleRegister" class="register-form">
-  <div class="input-group">
-    <input type="text" v-model="register.username" placeholder="Nom d'utilisateur" required>
-  </div>
-  <div class="input-group">
-    <input type="text" v-model="register.nom" placeholder="Nom" required>
-  </div>
-  <div class="input-group">
-    <input type="text" v-model="register.prenom" placeholder="Prénom" required>
-  </div>
-  <div class="input-group">
-    <input type="email" v-model="register.email" placeholder="Email" required>
-  </div>
-  <div class="input-group">
-    <input type="password" v-model="register.password" placeholder="Mot de passe" required>
-  </div>
-  <div class="input-group">
-    <input type="password" v-model="register.confirmpassword" placeholder="Confirmer mot de passe" required>
-  </div>
-  <div class="role-selection">
-    <h3>Je suis :</h3>
-    <div class="role-options">
-      <label class="role-label">
-        <input type="radio" v-model="register.role" value="conducteur" required>
-        <span class="custom-radio"></span>
-        <span class="role-text">Conducteur</span>
-      </label>
-      <label class="role-label">
-        <input type="radio" v-model="register.role" value="passager" required>
-        <span class="custom-radio"></span>
-        <span class="role-text">Passager</span>
-      </label>
-    </div>
-  </div>
-  <div v-if="registerMsg" class="success-message">{{ registerMsg }}</div>
-  <div v-if="errorMsg" class="error-message">{{ errorMsg }}</div>
-  <button 
-    type="submit" 
-    class="submit-btn"
-    :class="{ clicked: registerClicked }"
-    @mousedown="registerClicked = true"
-    @mouseup="registerClicked = false"
-    @mouseleave="registerClicked = false"
-  >
-    S'inscrire
-  </button>
-</form>
-
+          <div class="input-group">
+            <input type="text" v-model="register.nom" placeholder="Nom" required />
+          </div>
+          <div class="input-group">
+            <input type="text" v-model="register.prenom" placeholder="Prénom" required />
+          </div>
+          <div class="input-group">
+            <input type="text" v-model="register.username" placeholder="Nom d'utilisateur" required />
+          </div>
+          <div class="input-group">
+            <input type="email" v-model="register.email" placeholder="Email" required />
+          </div>
+          <div class="input-group">
+            <input type="password" v-model="register.password" placeholder="Mot de passe" required />
+          </div>
+          <div class="input-group">
+            <input type="password" v-model="register.confirmpassword" placeholder="Confirmer mot de passe" required />
+          </div>
+          <div class="role-selection">
+            <h3>Je suis :</h3>
+            <div class="role-options">
+              <label class="role-label">
+                <input type="radio" v-model="register.role" value="conducteur" required>
+                <span class="custom-radio"></span>
+                <span class="role-text">Conducteur</span>
+              </label>
+              <label class="role-label">
+                <input type="radio" v-model="register.role" value="passager" required>
+                <span class="custom-radio"></span>
+                <span class="role-text">Passager</span>
+              </label>
+            </div>
+          </div>
+          <button type="submit" class="submit-btn">S'inscrire</button>
+        </form>
       </div>
     </div>
   </div>
@@ -182,8 +169,8 @@ export default {
 
 
 
+
 <style scoped>
-/* Reset et base */
 * {
   margin: 0;
   padding: 0;
@@ -193,8 +180,8 @@ export default {
 .auth-page {
   position: relative;
   width: 100vw;
-  height: 100vh;
-  overflow: hidden;
+  height: 120vh;
+  overflow: auto;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
@@ -212,7 +199,7 @@ export default {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 100vh;
+  min-height: 100vh;
   padding: 0 20px;
 }
 
@@ -224,6 +211,7 @@ export default {
   box-shadow: rgb(3, 3, 2) 0px 0px 10px 0px;
   backdrop-filter: blur(10px);
   border-radius: 20px;
+  padding: 20px 30px;
 }
 
 .header h1 {
@@ -247,6 +235,8 @@ export default {
   border-radius: 50px;
   padding: 5px;
   backdrop-filter: blur(5px);
+  flex-wrap: wrap;
+  gap: 10px;
 }
 
 .tab-button {
@@ -259,6 +249,7 @@ export default {
   cursor: pointer;
   border-radius: 50px;
   transition: all 0.3s ease;
+  min-width: 120px;
 }
 
 .tab-button.active {
@@ -310,6 +301,8 @@ input:focus {
   margin: 20px 0;
   color: white;
   font-size: 0.9rem;
+  flex-wrap: wrap;
+  gap: 10px;
 }
 
 .remember-me {
@@ -321,7 +314,6 @@ input:focus {
 .remember-me input {
   width: auto;
   margin-right: 8px;
-
 }
 
 .forgot-password {
@@ -376,6 +368,7 @@ input:focus {
 .role-options {
   display: flex;
   gap: 20px;
+  flex-wrap: wrap;
 }
 
 .role-label {
@@ -416,5 +409,70 @@ input[type="radio"]:checked+.custom-radio::after {
 
 .role-text {
   font-size: 0.95rem;
+}
+
+/* RESPONSIVE DESIGN */
+@media (max-width: 900px) {
+  .header h1 {
+    font-size: 3.5rem;
+  }
+  .form-glass {
+    padding: 30px 20px;
+    max-width: 90vw;
+  }
+  .tab-button {
+    padding: 10px 20px;
+    font-size: 0.95rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .auth-container {
+    padding: 0 5px;
+  }
+  .header {
+    padding: 10px 5px;
+    margin-bottom: 25px;
+  }
+  .header h1 {
+    font-size: 2.2rem;
+  }
+  .tagline {
+    font-size: 1rem;
+  }
+  .tabs {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+    padding: 5px 0;
+  }
+  .tab-button {
+    width: 100%;
+    min-width: unset;
+    padding: 10px 0;
+    font-size: 0.95rem;
+  }
+  .form-glass {
+    padding: 18px 5px;
+    max-width: 100vw;
+  }
+  .input-group input {
+    padding: 12px 10px;
+    font-size: 0.95rem;
+  }
+  .form-options {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 0.85rem;
+  }
+  .submit-btn {
+    padding: 12px;
+    font-size: 0.95rem;
+  }
+  .role-options {
+    flex-direction: column;
+    gap: 10px;
+  }
 }
 </style>

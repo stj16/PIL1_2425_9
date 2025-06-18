@@ -139,10 +139,10 @@
         <div class="footer-section links">
           <h3 style="text-decoration: underline;">Liens rapides</h3>
           <ul>
-            <li><a href="#">Accueil</a></li>
-            <li><a href="#">Trajets</a></li>
-            <li><a href="#">Comment ça marche</a></li>
-            <li><a href="#">Tarifs</a></li>
+            <li><router-link to="/">Accueil</router-link></li>
+            <li><router-link to="/connexion">Trajets</router-link></li>
+            <li><router-link to="/about">Comment ça marche</router-link></li>
+            <li><router-link to="/connexion">Tarifs</router-link></li>
             <li><a href="#">Contact</a></li>
           </ul>
         </div>
@@ -171,7 +171,7 @@ function Connexion(){
 </script>
 
 <style scoped>
-/* Import Font Awesome */
+
 @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css');
 
 /* Styles de base */
