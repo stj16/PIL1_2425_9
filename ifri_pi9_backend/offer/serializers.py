@@ -11,9 +11,15 @@ class carofferSerializer(serializers.ModelSerializer):
         fields = '__all__'
     
     def get_user(self, obj):
-        if obj.user:
-            return f"{obj.user.prenom} {obj.user.nom}"
+        try:
+            if obj.user:
+                return f"{obj.user.prenom} {obj.user.nom}"
+        except:
+            pass
         return "Conducteur"
     
     def get_user_id(self, obj):
-        return obj.user.id if obj.user else None
+        try:
+            return obj.user.id if obj.user else None
+        except:
+            return None
