@@ -24,7 +24,8 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
-    if (error.response?.status === 401) {
+    // Ne pas essayer de renouveler le token pour les erreurs de connexion
+    if (error.response?.status === 401 && error.config.url !== 'account/login/') {
       // Token expiré, essayer de le renouveler
       const refreshToken = localStorage.getItem('refresh');
       if (refreshToken) {

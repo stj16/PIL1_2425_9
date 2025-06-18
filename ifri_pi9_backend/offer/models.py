@@ -7,7 +7,6 @@ class caroffer(models.Model):
     depart = models.CharField(max_length=200)
     arrive = models.CharField(max_length=200)
     start_point_usual = models.CharField(max_length=200)
-    address = models.CharField(max_length=200, blank=True, null=True)  # Pour la géolocalisation
     date_time = models.DateTimeField(auto_now_add=True)
     place = models.IntegerField()
     price = models.IntegerField()

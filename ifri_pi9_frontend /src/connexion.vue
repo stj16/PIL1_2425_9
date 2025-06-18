@@ -29,19 +29,61 @@ export default {
       },
       errorMsg: '',
       registerMsg: '',
-      isLoading: false
+      isLoading: false,
+      isLoggingIn: false
     }
   },
   methods: {
     async handleLogin() {
+      // Éviter les tentatives multiples
+      if (this.isLoggingIn) return;
+      
       this.errorMsg = '';
+      this.isLoading = true;
+      this.isLoggingIn = true;
+      
+      // Validation côté client
+      if (!this.login.email || !this.login.password) {
+        this.errorMsg = 'Veuillez remplir tous les champs';
+        this.isLoading = false;
+        this.isLoggingIn = false;
+        return;
+      }
+      
+      // Validation basique de l'email
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(this.login.email)) {
+        this.errorMsg = 'Veuillez entrer une adresse email valide';
+        this.isLoading = false;
+        this.isLoggingIn = false;
+        return;
+      }
+      
       try {
         const res = await login(this.login.email, this.login.password);
         localStorage.setItem('access', res.data.access);
         localStorage.setItem('refresh', res.data.refresh);
         this.$router.push('/welcome'); // Redirection après connexion
       } catch (err) {
-        this.errorMsg = err.response?.data?.detail || 'Identifiants invalides';
+        console.error('Erreur de connexion:', err);
+        
+        // Messages d'erreur spécifiques selon le type d'erreur
+        if (err.response?.status === 401) {
+          this.errorMsg = 'Email ou mot de passe incorrect';
+        } else if (err.response?.status === 400) {
+          this.errorMsg = err.response.data?.detail || 'Données de connexion invalides';
+        } else if (err.response?.status === 404) {
+          this.errorMsg = 'Utilisateur non trouvé';
+        } else if (err.response?.status >= 500) {
+          this.errorMsg = 'Erreur serveur. Veuillez réessayer plus tard.';
+        } else if (err.code === 'NETWORK_ERROR' || err.code === 'ECONNABORTED') {
+          this.errorMsg = 'Erreur de connexion au serveur. Vérifiez votre connexion internet.';
+        } else {
+          this.errorMsg = 'Erreur lors de la connexion. Veuillez réessayer.';
+        }
+      } finally {
+        this.isLoading = false;
+        this.isLoggingIn = false;
       }
     },
     async handleRegister() {
@@ -163,8 +205,9 @@ export default {
             @mousedown="loginClicked = true"
             @mouseup="loginClicked = false"
             @mouseleave="loginClicked = false"
+            :disabled="isLoading"
           >
-            Se connecter
+            {{ isLoading ? 'Connexion en cours...' : 'Se connecter' }}
           </button>
           
           <!-- Message d'erreur pour la connexion -->
