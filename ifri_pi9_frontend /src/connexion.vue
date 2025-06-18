@@ -17,6 +17,7 @@ export default {
         nom: '',
         prenom: '',
         role: '',
+        phone_number: '',
         password: '',
         confirmpassword: ''
       },
@@ -39,7 +40,7 @@ export default {
         localStorage.setItem('refresh', res.data.refresh);
         this.$router.push('/welcome'); // Redirection après connexion
       } catch (err) {
-        this.errorMsg = 'Identifiants invalides';
+        this.errorMsg = err.response?.data?.detail || 'Identifiants invalides';
       }
     },
     async handleRegister() {
@@ -50,23 +51,42 @@ export default {
         this.errorMsg = 'Les mots de passe ne correspondent pas';
         return;
       }
+      
+      if (this.register.password.length < 8) {
+        this.errorMsg = 'Le mot de passe doit contenir au moins 8 caractères';
+        return;
+      }
+      
       const payload = {
         email: this.register.email,
         username: this.register.username,
         nom: this.register.nom,
         prenom: this.register.prenom,
         role: this.register.role,
-        password: this.register.password
+        phone_number: this.register.phone_number || null,
+        password: this.register.password,
+        confirm_password: this.register.confirmpassword
       };
+      
       try {
         await register(payload);
         this.registerMsg = "Inscription réussie ! Connectez-vous.";
         this.activeTab = 'login';
         this.register = {
-          email: '', username: '', nom: '', prenom: '', role: '', password: '', confirmpassword: ''
+          email: '', 
+          username: '', 
+          nom: '', 
+          prenom: '', 
+          role: '', 
+          phone_number: '',
+          password: '', 
+          confirmpassword: ''
         };
       } catch (err) {
-        this.errorMsg = "Erreur lors de l'inscription. Vérifiez vos informations.";
+        this.errorMsg = err.response?.data?.email?.[0] || 
+                       err.response?.data?.username?.[0] || 
+                       err.response?.data?.password?.[0] || 
+                       "Erreur lors de l'inscription. Vérifiez vos informations.";
       }
     }
   }
@@ -138,6 +158,9 @@ export default {
           </div>
           <div class="input-group">
             <input type="email" v-model="register.email" placeholder="Email" required />
+          </div>
+          <div class="input-group">
+            <input type="tel" v-model="register.phone_number" placeholder="Téléphone (optionnel)" />
           </div>
           <div class="input-group">
             <input type="password" v-model="register.password" placeholder="Mot de passe" required />

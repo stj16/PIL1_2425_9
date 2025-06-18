@@ -87,8 +87,10 @@
 </template>
 <script setup>
 import { ref, nextTick, onMounted } from 'vue'
-import axios from 'axios'
+import { getConversations, getMessages, sendMessage, getUserProfile } from '@/api'
+import { useRoute } from 'vue-router'
 
+const route = useRoute()
 const conversations = ref([])
 const selectedConversation = ref(null)
 const newMessage = ref('')
@@ -96,60 +98,120 @@ const messages = ref([])
 const searchQuery = ref('')
 const filteredConversations = ref([])
 const filteredMessages = ref([])
+const users = ref([])
+const showNewConv = ref(false)
+const selectedUserId = ref('')
 
 const myUserId = ref(null) // On récupère l'id de l'utilisateur connecté
 
 // Charger l'utilisateur connecté (pour l'envoi de message)
 async function fetchMe() {
-  const token = localStorage.getItem('access')
-  const res = await axios.get('http://127.0.0.1:8000/account/user/', {
-    headers: { Authorization: `Bearer ${token}` }
-  })
-  myUserId.value = res.data.id
+  try {
+    const res = await getUserProfile()
+    myUserId.value = res.data.id
+  } catch (error) {
+    console.error('Erreur récupération utilisateur:', error)
+  }
 }
 
 // Charger les conversations à l'ouverture
 onMounted(async () => {
   await fetchMe()
-  const token = localStorage.getItem('access')
-  const res = await axios.get('http://127.0.0.1:8000/msg/conversations/', {
-    headers: { Authorization: `Bearer ${token}` }
-  })
-  conversations.value = res.data
-  filteredConversations.value = conversations.value
+  try {
+    const res = await getConversations()
+    conversations.value = res.data
+    filteredConversations.value = conversations.value
+    
+    // Vérifier s'il y a un paramètre de conversation dans l'URL
+    const conversationId = route.query.conversation
+    if (conversationId) {
+      const targetConversation = conversations.value.find(conv => conv.id === parseInt(conversationId))
+      if (targetConversation) {
+        await selectConversation(targetConversation)
+      }
+    }
+  } catch (error) {
+    console.error('Erreur récupération conversations:', error)
+  }
 })
 
 // Charger les messages lors de la sélection d'une conversation
 async function selectConversation(conv) {
   selectedConversation.value = conv
-  const token = localStorage.getItem('access')
-  const res = await axios.get(`http://127.0.0.1:8000/msg/messages/${conv.id}/`, {
-    headers: { Authorization: `Bearer ${token}` }
-  })
-  messages.value = res.data.map(msg => ({
-    id: msg.id,
-    text: msg.content,
-    fromMe: msg.sender === myUserId.value,
-    time: new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-    // Ajoute ici la gestion des fichiers si tu veux
-  }))
-  filteredMessages.value = messages.value
-  nextTick(scrollToBottom)
+  try {
+    const res = await getMessages(conv.id)
+    messages.value = res.data.map(msg => ({
+      id: msg.id,
+      text: msg.content,
+      fromMe: msg.sender === myUserId.value,
+      time: new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      // Ajoute ici la gestion des fichiers si tu veux
+    }))
+    filteredMessages.value = messages.value
+    nextTick(scrollToBottom)
+  } catch (error) {
+    console.error('Erreur récupération messages:', error)
+  }
 }
 
 // Envoyer un message
 async function sendMessage() {
   if (!selectedConversation.value || !newMessage.value.trim()) return
-  const token = localStorage.getItem('access')
-  await axios.post('http://127.0.0.1:8000/msg/', {
-    sender: myUserId.value,
-    receiver: selectedConversation.value.id,
-    content: newMessage.value,
-  }, {
-    headers: { Authorization: `Bearer ${token}` }
-  })
-  newMessage.value = ''
-  await selectConversation(selectedConversation.value) // Recharge les messages
+  
+  try {
+    await sendMessage({
+      sender: myUserId.value,
+      receiver: selectedConversation.value.id,
+      content: newMessage.value,
+    })
+    newMessage.value = ''
+    await selectConversation(selectedConversation.value) // Recharge les messages
+  } catch (error) {
+    console.error('Erreur envoi message:', error)
+    alert('Erreur lors de l\'envoi du message')
+  }
+}
+
+// Envoyer le premier message d'une nouvelle conversation
+async function sendFirstMessage() {
+  if (!selectedUserId.value || !newMessage.value.trim()) return
+  
+  try {
+    await sendMessage({
+      sender: myUserId.value,
+      receiver: selectedUserId.value,
+      content: newMessage.value,
+    })
+    newMessage.value = ''
+    selectedUserId.value = ''
+    showNewConv.value = false
+    // Recharger les conversations
+    const res = await getConversations()
+    conversations.value = res.data
+    filteredConversations.value = conversations.value
+  } catch (error) {
+    console.error('Erreur envoi premier message:', error)
+    alert('Erreur lors de l\'envoi du message')
+  }
+}
+
+// Ouvrir la modal de nouvelle conversation
+function openNewConv() {
+  showNewConv.value = true
+  // Charger la liste des utilisateurs si pas encore fait
+  if (users.value.length === 0) {
+    loadUsers()
+  }
+}
+
+// Charger la liste des utilisateurs
+async function loadUsers() {
+  try {
+    const res = await getUsers()
+    users.value = res.data.filter(user => user.id !== myUserId.value)
+  } catch (error) {
+    console.error('Erreur récupération utilisateurs:', error)
+  }
 }
 
 // Filtrer les conversations/messages

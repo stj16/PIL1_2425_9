@@ -5,8 +5,8 @@ from .permissions import IsOwnerOrReadOnly
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
-from .models import msg
 from django.contrib.auth import get_user_model
+from django.db import models
 # Create your views here.
 class msgListecreateview(viewsets.ModelViewSet):
     queryset = msg.objects.all()

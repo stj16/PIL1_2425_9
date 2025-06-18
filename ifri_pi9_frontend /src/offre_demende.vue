@@ -26,6 +26,12 @@
                 >
                     Publier une offre
                 </button>
+                <button
+                    @click="goToMessagerie"
+                    class="messagerie-btn"
+                >
+                    <i class="fa fa-comments"></i> Messagerie
+                </button>
                 <span class="switch-bg" :style="switchStyle"></span>
             </div>
         </nav>
@@ -53,6 +59,15 @@
                                     <span class="driver"><i class="fa fa-user"></i> {{ offre.user || 'Conducteur' }}</span>
                                     <span class="seats"><i class="fa fa-chair"></i> {{ offre.place }} places</span>
                                     <span class="price"><i class="fa fa-money-bill"></i> {{ offre.price }} FCFA</span>
+                                </div>
+                                <div class="offer-actions">
+                                    <button 
+                                        @click="discuterAvecConducteur(offre)" 
+                                        class="chat-btn"
+                                        :disabled="!offre.user_id"
+                                    >
+                                        <i class="fa fa-comments"></i> Discuter avec le conducteur
+                                    </button>
                                 </div>
                             </li>
                         </ul>
@@ -133,6 +148,30 @@
         <button class="floating-btn" @click="showSidePanel=true" v-if="!showSidePanel">
             <span>🕒</span> Mes trajets récents
         </button>
+
+        <!-- Modal pour composer un message -->
+        <div v-if="showMessageModal" class="modal-overlay" @click="closeMessageModal">
+            <div class="modal-content" @click.stop>
+                <div class="modal-header">
+                    <h3>Envoyer un message à {{ selectedDriver }}</h3>
+                    <button @click="closeMessageModal" class="close-modal">×</button>
+                </div>
+                <div class="modal-body">
+                    <textarea 
+                        v-model="firstMessage" 
+                        placeholder="Écrivez votre message..."
+                        rows="4"
+                        class="message-input"
+                    ></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button @click="closeMessageModal" class="btn-secondary">Annuler</button>
+                    <button @click="sendFirstMessage" class="btn-primary" :disabled="!firstMessage.trim()">
+                        Envoyer
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -143,6 +182,10 @@
 import { ref, computed, onMounted } from 'vue'
 import { getOffers, createOffer } from '@/api'
 import { getDemandes, createDemande } from '@/api'
+import { sendMessage, getConversations } from '@/api'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
 
 const demandes = ref([])
 const loadingDemande = ref(false)
@@ -352,6 +395,78 @@ onMounted(() => {
   fetchOffers()
   fetchDemandes()
 })
+
+// Fonction pour discuter avec le conducteur
+const discutierAvecConducteur = async (offre) => {
+  if (!offre.user_id) {
+    alert('Informations du conducteur non disponibles')
+    return
+  }
+
+  try {
+    // Vérifier si une conversation existe déjà
+    const conversations = await getConversations()
+    const existingConv = conversations.data.find(conv => conv.id === offre.user_id)
+    
+    if (existingConv) {
+      // Conversation existe déjà, naviguer vers la messagerie avec cette conversation sélectionnée
+      router.push({
+        name: 'messagerie',
+        query: { conversation: offre.user_id }
+      })
+    } else {
+      // Pas de conversation existante, proposer de créer un premier message
+      showMessageModal.value = true
+      selectedDriver.value = offre.user || 'le conducteur'
+      selectedOffre.value = offre
+    }
+  } catch (error) {
+    console.error('Erreur lors de la création de la conversation:', error)
+    alert('Erreur lors de la création de la conversation. Veuillez réessayer.')
+  }
+}
+
+// Modal pour composer un message
+const showMessageModal = ref(false)
+const selectedDriver = ref('')
+const firstMessage = ref('')
+const selectedOffre = ref(null)
+
+// Fonction pour envoyer le premier message
+const sendFirstMessage = async () => {
+  if (!selectedOffre.value || !firstMessage.value.trim()) return
+  
+  try {
+    await sendMessage({
+      sender: null, // Sera rempli par le backend
+      receiver: selectedOffre.value.user_id,
+      content: firstMessage.value.trim()
+    })
+    alert('Message envoyé ! Vous pouvez maintenant discuter dans la messagerie.')
+    router.push({
+      name: 'messagerie',
+      query: { conversation: selectedOffre.value.user_id }
+    })
+    showMessageModal.value = false
+    firstMessage.value = ''
+    selectedOffre.value = null
+  } catch (error) {
+    console.error('Erreur lors de la création de la conversation:', error)
+    alert('Erreur lors de la création de la conversation. Veuillez réessayer.')
+  }
+}
+
+// Fonction pour fermer la modal
+const closeMessageModal = () => {
+  showMessageModal.value = false
+  firstMessage.value = ''
+  selectedOffre.value = null
+}
+
+// Fonction pour aller à la messagerie
+const goToMessagerie = () => {
+  router.push({ name: 'messagerie' })
+}
 </script>
 
 
@@ -500,20 +615,18 @@ h2 {
     gap: 1.5rem;
 }
 .offer-card {
-    background: var(--accent);
-    border-radius: 20px;
-    box-shadow: var(--shadow);
-    padding: 1.2rem;
-    transition: transform 0.15s, box-shadow 0.15s;
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    border: 1.5px solid transparent;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
 }
 .offer-card:hover {
-    transform: translateY(-4px) scale(1.03);
-    box-shadow: 0 4px 24px #2d8cff33;
-    border: 1.5px solid var(--switch);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(10, 35, 66, 0.3);
+    border-color: var(--highlight);
 }
 .offer-header {
     display: flex;
@@ -702,5 +815,147 @@ h2 {
     .nav-buttons {
         min-width: 0;
     }
+}
+
+.offer-actions {
+    margin-top: 1rem;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.chat-btn {
+    background: linear-gradient(135deg, var(--highlight) 0%, #1e88e5 100%);
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 25px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    box-shadow: 0 4px 15px rgba(45, 140, 255, 0.3);
+}
+
+.chat-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(45, 140, 255, 0.4);
+    background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%);
+}
+
+.chat-btn:disabled {
+    background: #666;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.chat-btn i {
+    font-size: 1.1rem;
+}
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: #fff;
+    padding: 2rem;
+    border-radius: 8px;
+    width: 80%;
+    max-width: 600px;
+    position: relative;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.modal-header h3 {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.close-modal {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+
+.modal-body {
+    margin-bottom: 1rem;
+}
+
+.message-input {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+}
+
+.btn-secondary, .btn-primary {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.btn-secondary {
+    background: #ccc;
+}
+
+.btn-primary {
+    background: var(--switch);
+    color: #fff;
+}
+
+.btn-primary:disabled {
+    background: #666;
+    cursor: not-allowed;
+}
+
+.messagerie-btn {
+    background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 25px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+    margin-left: 1rem;
+}
+
+.messagerie-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+    background: linear-gradient(135deg, #45a049 0%, #3d8b40 100%);
+}
+
+.messagerie-btn i {
+    font-size: 1.1rem;
 }
 </style>

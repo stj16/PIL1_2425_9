@@ -33,6 +33,8 @@
 </template>
 
 <script>
+import { forgotPassword } from '@/api'
+
 export default {
   name: 'ForgotPassword',
   data() {
@@ -46,7 +48,6 @@ export default {
   },
   methods: {
     validateEmail(email) {
-      
       const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
       return re.test(String(email).toLowerCase());
     },
@@ -70,13 +71,15 @@ export default {
 
       // 2. Appel à l'API (backend)
       try {
-        const response = await axios.post('/api/forgot-password', { email: this.email });
+        const response = await forgotPassword(this.email);
         this.successMessage = response.data.message || 'Un lien de réinitialisation a été envoyé à votre adresse e-mail.';
         this.email = ''; 
       } catch (error) {
         // Gérer les erreurs de l'API
         if (error.response && error.response.data && error.response.data.message) {
           this.errorMessage = error.response.data.message;
+        } else if (error.response && error.response.data && error.response.data.email) {
+          this.errorMessage = error.response.data.email[0];
         } else {
           this.errorMessage = 'Une erreur est survenue. Veuillez réessayer plus tard.';
         }

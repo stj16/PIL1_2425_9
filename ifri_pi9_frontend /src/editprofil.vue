@@ -10,13 +10,23 @@
         </div>
 
         <div class="form-group">
-          <label for="name">Nom</label>
-          <input type="text" id="name" v-model="form.name" required />
+          <label for="nom">Nom</label>
+          <input type="text" id="nom" v-model="form.nom" required />
+        </div>
+
+        <div class="form-group">
+          <label for="prenom">Prénom</label>
+          <input type="text" id="prenom" v-model="form.prenom" required />
         </div>
 
         <div class="form-group">
           <label for="email">Email</label>
           <input type="email" id="email" v-model="form.email" required />
+        </div>
+
+        <div class="form-group">
+          <label for="phone_number">Téléphone</label>
+          <input type="tel" id="phone_number" v-model="form.phone_number" />
         </div>
 
         <div class="form-group">
@@ -31,43 +41,52 @@
         <div v-if="form.role === 'conducteur'" class="driver-fields">
           <div class="form-group">
             <label for="vehicleName">Nom du véhicule</label>
-            <input type="text" id="vehicleName" v-model="form.vehicleName" required />
+            <input type="text" id="vehicleName" v-model="form.vehicleName" />
           </div>
           <div class="form-group">
             <label for="serialNumber">Numéro de série</label>
-            <input type="text" id="serialNumber" v-model="form.serialNumber" required />
+            <input type="text" id="serialNumber" v-model="form.serialNumber" />
           </div>
           <div class="form-group">
             <label for="brand">Marque de voiture</label>
-            <input type="text" id="brand" v-model="form.brand" required />
+            <input type="text" id="brand" v-model="form.brand" />
           </div>
           <div class="form-group">
             <label for="color">Couleur</label>
-            <input type="text" id="color" v-model="form.color" required />
+            <input type="text" id="color" v-model="form.color" />
           </div>
           <div class="form-group">
             <label for="plateNumber">Numéro d'immatriculation</label>
-            <input type="text" id="plateNumber" v-model="form.plateNumber" required />
+            <input type="text" id="plateNumber" v-model="form.plateNumber" />
           </div>
         </div>
 
-        <router-link to="/profil"><button type="submit">Enregistrer</button></router-link>
+        <button type="submit" :disabled="loading">
+          {{ loading ? 'Enregistrement...' : 'Enregistrer' }}
+        </button>
+        
+        <p v-if="message" :class="{ success: success, error: !success }">{{ message }}</p>
       </form>
     </div>
   </body>
 </template>
 
 <script>
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
+import { getUserProfile, updateUserProfile, uploadFile } from "@/api";
+
 const router = useRouter();
+
 export default {
   name: "EditProfil",
   data() {
     return {
       form: {
-        name: "",
+        nom: "",
+        prenom: "",
         email: "",
+        phone_number: "",
         role: "",
         vehicleName: "",
         serialNumber: "",
@@ -77,7 +96,37 @@ export default {
       },
       profilePic: null,
       profilePicUrl: "",
+      loading: false,
+      message: "",
+      success: false
     };
+  },
+  async mounted() {
+    try {
+      const response = await getUserProfile();
+      const userData = response.data;
+      
+      this.form = {
+        nom: userData.nom || "",
+        prenom: userData.prenom || "",
+        email: userData.email || "",
+        phone_number: userData.phone_number || "",
+        role: userData.role || "",
+        vehicleName: userData.vehicleName || "",
+        serialNumber: userData.serialNumber || "",
+        brand: userData.brand || "",
+        color: userData.color || "",
+        plateNumber: userData.plateNumber || "",
+      };
+      
+      if (userData.photo) {
+        this.profilePicUrl = userData.photo;
+      }
+    } catch (error) {
+      console.error('Erreur chargement profil:', error);
+      this.message = "Erreur lors du chargement du profil";
+      this.success = false;
+    }
   },
   methods: {
     onFileChange(e) {
@@ -87,19 +136,35 @@ export default {
         this.profilePicUrl = URL.createObjectURL(file);
       }
     },
-    submitForm() {
-      if (
-        this.form.role === "conducteur" &&
-        (!this.form.vehicleName ||
-          !this.form.serialNumber ||
-          !this.form.brand ||
-          !this.form.color ||
-          !this.form.plateNumber)
-      ) {
-        alert("Veuillez remplir tous les champs du conducteur.");
-        return;
+    async submitForm() {
+      this.loading = true;
+      this.message = "";
+      
+      try {
+        // Upload de la photo si elle a été modifiée
+        if (this.profilePic) {
+          const uploadResponse = await uploadFile(this.profilePic, 'photo');
+          this.form.photo = uploadResponse.data.url;
+        }
+        
+        // Mise à jour du profil
+        await updateUserProfile(this.form);
+        
+        this.message = "Profil mis à jour avec succès !";
+        this.success = true;
+        
+        // Redirection vers le profil après 2 secondes
+        setTimeout(() => {
+          router.push('/profil');
+        }, 2000);
+        
+      } catch (error) {
+        console.error('Erreur mise à jour profil:', error);
+        this.message = error.response?.data?.detail || "Erreur lors de la mise à jour du profil";
+        this.success = false;
+      } finally {
+        this.loading = false;
       }
-      alert("Profil mis à jour !");
     },
   },
 };

@@ -80,7 +80,7 @@
 <script setup>
 import { ref, onMounted, onBeforeUnmount } from 'vue'
 import { useRouter } from 'vue-router'
-import axios from 'axios'
+import { getUserProfile, uploadFile } from '@/api'
 
 const user = ref({})
 const loading = ref(true)
@@ -88,13 +88,11 @@ const error = ref('')
 
 onMounted(async () => {
   try {
-    const token = localStorage.getItem('access')
-    const res = await axios.get('http://127.0.0.1:8000/account/user/', {
-      headers: { Authorization: `Bearer ${token}` }
-    })
+    const res = await getUserProfile()
     user.value = res.data
   } catch (e) {
     error.value = "Erreur lors du chargement du profil utilisateur."
+    console.error('Erreur profil:', e)
   } finally {
     loading.value = false
   }
@@ -113,7 +111,6 @@ const notifications = ref([
   { id: 3, title: 'Avis reçu', content: 'Paul a laissé un commentaire sur votre trajet', read: true, time: '2h' },
   { id: 4, title: 'Paiement effectué', content: 'Votre paiement de 15€ a été accepté', read: true, time: '1j' }
 ])
-
 
 const toggleDropdown = () => {
   dropdownOpen.value = !dropdownOpen.value
@@ -168,14 +165,23 @@ onBeforeUnmount(() => {
   document.removeEventListener('click', handleClickOutside)
 })
 
-function onAvatarChange(e) {
+async function onAvatarChange(e) {
   const file = e.target.files[0]
   if (file) {
-    const reader = new FileReader()
-    reader.onload = (ev) => {
-      user.value.avatar = ev.target.result
+    try {
+      const formData = new FormData()
+      formData.append('photo', file)
+      
+      const response = await uploadFile(file, 'photo')
+      user.value.photo = response.data.url
+      
+      // Mettre à jour le profil avec la nouvelle photo
+      await updateUserProfile({ photo: response.data.url })
+      
+    } catch (error) {
+      console.error('Erreur upload photo:', error)
+      alert('Erreur lors du téléchargement de la photo')
     }
-    reader.readAsDataURL(file)
   }
 }
 </script>

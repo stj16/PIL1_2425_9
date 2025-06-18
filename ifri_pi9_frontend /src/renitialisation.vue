@@ -34,8 +34,12 @@
 
 <script setup>
 import { ref } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { resetPassword } from '@/api'
 
-const email = ref('')
+const route = useRoute()
+const router = useRouter()
+
 const newPassword = ref('')
 const confirmPassword = ref('')
 const loading = ref(false)
@@ -47,9 +51,9 @@ const submitForm = async () => {
     message.value = ''
     success.value = false
 
-    if (newPassword.value.length < 6) {
+    if (newPassword.value.length < 8) {
         loading.value = false
-        message.value = "Le mot de passe doit contenir au moins 6 caractères."
+        message.value = "Le mot de passe doit contenir au moins 8 caractères."
         return
     }
     if (newPassword.value !== confirmPassword.value) {
@@ -58,19 +62,31 @@ const submitForm = async () => {
         return
     }
 
-    setTimeout(() => {
-        loading.value = false
-        if (email.value === 'test@example.com') {
-            message.value = 'Votre mot de passe a été réinitialisé avec succès.'
-            success.value = true
-            email.value = ''
-            newPassword.value = ''
-            confirmPassword.value = ''
-        } else {
-            message.value = "Adresse e-mail non reconnue."
-            success.value = false
+    try {
+        // Récupérer les paramètres de l'URL
+        const uid = route.query.uid
+        const token = route.query.token
+        
+        if (!uid || !token) {
+            message.value = "Lien de réinitialisation invalide."
+            return
         }
-    }, 1500)
+
+        const response = await resetPassword(uid, token, newPassword.value)
+        message.value = 'Votre mot de passe a été réinitialisé avec succès.'
+        success.value = true
+        
+        // Redirection vers la connexion après 3 secondes
+        setTimeout(() => {
+            router.push('/connexion')
+        }, 3000)
+        
+    } catch (error) {
+        message.value = error.response?.data?.error || "Erreur lors de la réinitialisation du mot de passe."
+        success.value = false
+    } finally {
+        loading.value = false
+    }
 }
 </script>
 

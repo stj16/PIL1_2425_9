@@ -19,6 +19,11 @@ const routes = [
     {
         path: '/profil',
         component: () => import('../profil.vue')
+    },
+    {
+        path: '/messagerie',
+        name: 'messagerie',
+        component: () => import('../messagerie.vue')
     }
 ];
 
