@@ -12,6 +12,7 @@ class caroffer(models.Model):
     hour = models.TimeField(auto_now_add=True)
     place = models.IntegerField()
     price = models.IntegerField()
+    matricule = models.CharField(max_length=50)
     
     class Meta:
         ordering = ['-date_time']
