@@ -1,0 +1,46 @@
+MANUEL D'UTILISATION DU SITE WEB GO-IFRI
+
+Bienvenue sur GO-IFRI, votre plateforme de covoiturage dédiée à la communauté IFRI. Ce manuel vous guide à travers les principales fonctionnalités du site.
+
+1. Connexion
+- Accédez à la page de connexion pour entrer votre identifiant et mot de passe.
+- En cas d’oubli, utilisez l’option "Mot de passe oublié".
+
+2. Accueil
+- Après connexion, la page d’accueil présente un résumé de vos activités récentes et des offres/demandes de covoiturage disponibles.
+
+3. Rechercher un trajet
+- Utilisez la fonction de recherche pour trouver un trajet selon votre point de départ, destination et date.
+- Les résultats affichent les offres de covoiturage correspondantes.
+
+4. Offre de covoiturage
+- Proposez un trajet en remplissant le formulaire d’offre.
+- Indiquez les détails : lieu de départ, destination, date, heure, nombre de places disponibles, etc.
+
+5. Demande de covoiturage
+- Publiez une demande si vous cherchez un trajet spécifique.
+- Précisez vos besoins pour que les conducteurs puissent vous contacter.
+
+6. Réserver un trajet
+- Cliquez sur une offre ou une demande pour voir les détails.
+- Utilisez le bouton "Réserver" pour envoyer une demande de réservation au conducteur.
+
+7. Profil
+- Consultez et modifiez vos informations personnelles (nom, email, photo, etc.).
+- Accédez à l’historique de vos trajets et réservations.
+
+8. Paramètres
+- Gérez vos préférences de notifications et paramètres du compte.
+
+9. Modifier le mot de passe
+- Changez votre mot de passe à tout moment via la section dédiée.
+
+10. Modifier le profil
+- Mettez à jour vos informations personnelles pour garder votre profil à jour.
+
+11. Déconnexion
+- Utilisez le bouton "Déconnexion" pour quitter votre session en toute sécurité.
+
+Pour toute question ou assistance, veuillez contacter le support via la page de contact du site.
+
+Bonne utilisation de GO-IFRI !
