@@ -28,7 +28,8 @@ export default {
         background: '#fff', color: '#1e293b', fontWeight: 'bold'
       },
       errorMsg: '',
-      registerMsg: ''
+      registerMsg: '',
+      isLoading: false
     }
   },
   methods: {
@@ -44,16 +45,29 @@ export default {
       }
     },
     async handleRegister() {
+      console.log('handleRegister appelé')
       this.registerMsg = '';
       this.errorMsg = '';
+      this.isLoading = true;
+     
+      // Validation des champs requis
+      if (!this.register.email || !this.register.username || !this.register.nom || 
+          !this.register.prenom || !this.register.role || !this.register.password || 
+          !this.register.confirmpassword) {
+        this.errorMsg = 'Tous les champs obligatoires doivent être remplis';
+        this.isLoading = false;
+        return;
+      }
      
       if (this.register.password !== this.register.confirmpassword) {
         this.errorMsg = 'Les mots de passe ne correspondent pas';
+        this.isLoading = false;
         return;
       }
       
       if (this.register.password.length < 8) {
         this.errorMsg = 'Le mot de passe doit contenir au moins 8 caractères';
+        this.isLoading = false;
         return;
       }
       
@@ -68,8 +82,11 @@ export default {
         confirm_password: this.register.confirmpassword
       };
       
+      console.log('Payload d\'inscription:', payload)
+      
       try {
-        await register(payload);
+        const response = await register(payload);
+        console.log('Réponse d\'inscription:', response)
         this.registerMsg = "Inscription réussie ! Connectez-vous.";
         this.activeTab = 'login';
         this.register = {
@@ -83,10 +100,14 @@ export default {
           confirmpassword: ''
         };
       } catch (err) {
+        console.error('Erreur d\'inscription:', err)
         this.errorMsg = err.response?.data?.email?.[0] || 
                        err.response?.data?.username?.[0] || 
                        err.response?.data?.password?.[0] || 
+                       err.response?.data?.detail ||
                        "Erreur lors de l'inscription. Vérifiez vos informations.";
+      } finally {
+        this.isLoading = false;
       }
     }
   }
@@ -145,6 +166,11 @@ export default {
           >
             Se connecter
           </button>
+          
+          <!-- Message d'erreur pour la connexion -->
+          <div v-if="errorMsg && activeTab === 'login'" class="error-message">
+            {{ errorMsg }}
+          </div>
         </form>
         <form v-else @submit.prevent="handleRegister" class="register-form">
           <div class="input-group">
@@ -183,7 +209,22 @@ export default {
               </label>
             </div>
           </div>
-          <button type="submit" class="submit-btn">S'inscrire</button>
+          <button 
+            type="submit" 
+            class="submit-btn"
+            @click="handleRegister"
+            :disabled="isLoading"
+          >
+            {{ isLoading ? 'Inscription en cours...' : 'S\'inscrire' }}
+          </button>
+          
+          <!-- Messages d'erreur et de succès -->
+          <div v-if="errorMsg" class="error-message">
+            {{ errorMsg }}
+          </div>
+          <div v-if="registerMsg" class="success-message">
+            {{ registerMsg }}
+          </div>
         </form>
       </div>
     </div>
@@ -377,6 +418,14 @@ input:focus {
   box-shadow: 0 6px 20px rgba(66, 165, 245, 0.4);
 }
 
+.submit-btn:disabled {
+  background: #666;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+  opacity: 0.7;
+}
+
 /* Sélection de rôle */
 .role-selection {
   margin: 30px 0;
@@ -497,5 +546,28 @@ input[type="radio"]:checked+.custom-radio::after {
     flex-direction: column;
     gap: 10px;
   }
+}
+
+/* Messages d'erreur et de succès */
+.error-message {
+  margin-top: 15px;
+  padding: 10px;
+  background: rgba(244, 67, 54, 0.1);
+  border: 1px solid rgba(244, 67, 54, 0.3);
+  border-radius: 8px;
+  color: #ff6b6b;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.success-message {
+  margin-top: 15px;
+  padding: 10px;
+  background: rgba(76, 175, 80, 0.1);
+  border: 1px solid rgba(76, 175, 80, 0.3);
+  border-radius: 8px;
+  color: #4caf50;
+  font-size: 0.9rem;
+  text-align: center;
 }
 </style>
