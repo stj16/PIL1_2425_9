@@ -9,6 +9,7 @@ class caroffer(models.Model):
     start_point_usual = models.CharField(max_length=200)
     date_time = models.DateTimeField(auto_now_add=True)
     day = models.DateField(auto_now_add=True)
+    hour = models.TimeField(auto_now_add=True)
     place = models.IntegerField()
     price = models.IntegerField()
     
