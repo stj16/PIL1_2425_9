@@ -1,6 +1,5 @@
 from rest_framework import serializers
 from .models import caroffer
-from account.serializers import UserSerializer
  
  
 class carofferSerializer(serializers.ModelSerializer):
