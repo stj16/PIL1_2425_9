@@ -87,7 +87,7 @@
 </template>
 <script setup>
 import { ref, nextTick, onMounted } from 'vue'
-import { getConversations, getMessages, sendMessage, getUserProfile } from '@/api'
+import { getConversations, getMessages, sendMessage as sendMessageApi, getUserProfile } from '@/api'
 import { useRoute } from 'vue-router'
 
 const route = useRoute()
@@ -159,7 +159,7 @@ async function sendMessage() {
   if (!selectedConversation.value || !newMessage.value.trim()) return
   
   try {
-    await sendMessage({
+    await sendMessageApi({
       sender: myUserId.value,
       receiver: selectedConversation.value.id,
       content: newMessage.value,
@@ -177,7 +177,7 @@ async function sendFirstMessage() {
   if (!selectedUserId.value || !newMessage.value.trim()) return
   
   try {
-    await sendMessage({
+    await sendMessageApi({
       sender: myUserId.value,
       receiver: selectedUserId.value,
       content: newMessage.value,
